@@ -9,20 +9,36 @@ import {
 import type { ActionResult } from '@/types/actions'
 import type { Application, ApplicationWithRelations } from '@/types/database'
 
-export async function getApplications(): Promise<ApplicationWithRelations[]> {
+interface GetApplicationsOptions {
+  search?: string
+  status?: string
+}
+
+export async function getApplications(
+  options: GetApplicationsOptions = {}
+): Promise<ApplicationWithRelations[]> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('applications')
-    .select(
-      `
+  let query = supabase.from('applications').select(
+    `
       *,
       application_tags (
         tag:tags (*)
       )
     `
+  )
+
+  if (options.search) {
+    query = query.or(
+      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
     )
-    .order('updated_at', { ascending: false })
+  }
+
+  if (options.status && options.status !== 'all') {
+    query = query.eq('status', options.status)
+  }
+
+  const { data, error } = await query.order('updated_at', { ascending: false })
 
   if (error) throw error
 
