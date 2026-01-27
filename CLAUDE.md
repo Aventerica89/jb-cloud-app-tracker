@@ -136,11 +136,11 @@ See `docs/PLAN.md` for detailed implementation plan.
 
 ### Phases
 
-- [ ] Phase 1: Foundation (auth, layout)
-- [ ] Phase 2: Core Data (providers, tags, applications)
-- [ ] Phase 3: Deployments
-- [ ] Phase 4: Dashboard
-- [ ] Phase 5: Polish (search, dark mode)
+- [x] Phase 1: Foundation (auth, layout)
+- [x] Phase 2: Core Data (providers, tags, applications)
+- [x] Phase 3: Deployments
+- [x] Phase 4: Dashboard
+- [x] Phase 5: Polish (search, dark mode)
 - [ ] Phase 6: Launch (testing, deploy)
 
 ---
