@@ -1,18 +1,32 @@
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
+import { getApplication } from '@/lib/actions/applications'
 import { getTags } from '@/lib/actions/tags'
 import { ApplicationForm } from '@/components/applications/application-form'
 
-export default async function NewApplicationPage() {
-  const tags = await getTags()
+interface Props {
+  params: Promise<{ id: string }>
+}
+
+export default async function EditApplicationPage({ params }: Props) {
+  const { id } = await params
+  const [application, tags] = await Promise.all([getApplication(id), getTags()])
+
+  if (!application) {
+    notFound()
+  }
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="New Application" description="Add a new cloud application">
-        <Link href="/applications">
+      <Header
+        title="Edit Application"
+        description={`Editing ${application.name}`}
+      >
+        <Link href={`/applications/${application.id}`}>
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -23,7 +37,7 @@ export default async function NewApplicationPage() {
       <div className="flex-1 p-6">
         <Card className="max-w-2xl">
           <CardContent className="pt-6">
-            <ApplicationForm tags={tags} />
+            <ApplicationForm application={application} tags={tags} />
           </CardContent>
         </Card>
       </div>
