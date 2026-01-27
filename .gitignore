@@ -1,41 +1,42 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Testing
-coverage/
-.nyc_output/
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Next.js
-.next/
-out/
-build/
+# testing
+/coverage
 
-# Production
-dist/
+# next.js
+/.next/
+/out/
 
-# Misc
+# production
+/build
+
+# misc
 .DS_Store
 *.pem
 
-# Debug
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# env files (can opt-in for committing if needed)
+.env*
 
-# Vercel
+# vercel
 .vercel
 
-# TypeScript
+# typescript
 *.tsbuildinfo
 next-env.d.ts
 
@@ -57,5 +58,5 @@ test-results/
 # Turbo
 .turbo
 
-# Generated types
-src/types/supabase.ts
+# Keep .env.example but ignore actual env files
+!.env.example
