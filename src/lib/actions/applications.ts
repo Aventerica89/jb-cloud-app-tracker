@@ -121,6 +121,7 @@ export async function createApplication(
           .split(',')
           .filter(Boolean)
       : [],
+    vercel_project_id: formData.get('vercel_project_id') || undefined,
   }
 
   const parsed = createApplicationSchema.safeParse(rawData)
@@ -132,11 +133,15 @@ export async function createApplication(
     }
   }
 
-  const { tag_ids, ...applicationData } = parsed.data
+  const { tag_ids, vercel_project_id, ...applicationData } = parsed.data
 
   const { data, error } = await supabase
     .from('applications')
-    .insert({ ...applicationData, user_id: user.id })
+    .insert({
+      ...applicationData,
+      user_id: user.id,
+      vercel_project_id: vercel_project_id || null,
+    })
     .select('id')
     .single()
 
@@ -194,6 +199,7 @@ export async function updateApplication(
           .split(',')
           .filter(Boolean)
       : undefined,
+    vercel_project_id: formData.get('vercel_project_id'),
   }
 
   const parsed = updateApplicationSchema.safeParse(rawData)
@@ -205,11 +211,14 @@ export async function updateApplication(
     }
   }
 
-  const { id, tag_ids, ...updateData } = parsed.data
+  const { id, tag_ids, vercel_project_id, ...updateData } = parsed.data
 
   const { error } = await supabase
     .from('applications')
-    .update(updateData)
+    .update({
+      ...updateData,
+      vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
+    })
     .eq('id', id)
 
   if (error) {

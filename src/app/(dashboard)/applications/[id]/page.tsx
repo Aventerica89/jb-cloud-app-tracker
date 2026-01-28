@@ -7,13 +7,13 @@ import { Badge } from '@/components/ui/badge'
 import {
   ArrowLeft,
   Pencil,
-  Trash2,
   ExternalLink,
   GitBranch,
   Rocket,
 } from 'lucide-react'
 import { getApplication } from '@/lib/actions/applications'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
+import { SyncButton } from '@/components/applications/sync-button'
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -116,12 +116,18 @@ export default async function ApplicationDetailPage({ params }: Props) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">Deployments</CardTitle>
-            <Link href={`/deployments/new?app=${app.id}`}>
-              <Button size="sm">
-                <Rocket className="mr-2 h-4 w-4" />
-                Add Deployment
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <SyncButton
+                applicationId={app.id}
+                hasVercelProject={!!app.vercel_project_id}
+              />
+              <Link href={`/deployments/new?app=${app.id}`}>
+                <Button size="sm">
+                  <Rocket className="mr-2 h-4 w-4" />
+                  Add Deployment
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
             {app.deployments && app.deployments.length > 0 ? (

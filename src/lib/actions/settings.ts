@@ -1,0 +1,99 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/server'
+import type { ActionResult } from '@/types/actions'
+import type { UserSettings } from '@/types/database'
+
+export async function getUserSettings(): Promise<UserSettings | null> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('user_settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    throw error
+  }
+
+  return data
+}
+
+export async function hasVercelToken(): Promise<boolean> {
+  const settings = await getUserSettings()
+  return !!settings?.vercel_token
+}
+
+export async function saveVercelSettings(
+  formData: FormData
+): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const vercelToken = formData.get('vercel_token') as string
+  const vercelTeamId = (formData.get('vercel_team_id') as string) || null
+
+  if (!vercelToken) {
+    return { success: false, error: 'Vercel token is required' }
+  }
+
+  const { error } = await supabase.from('user_settings').upsert(
+    {
+      user_id: user.id,
+      vercel_token: vercelToken,
+      vercel_team_id: vercelTeamId,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' }
+  )
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}
+
+export async function deleteVercelSettings(): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const { error } = await supabase
+    .from('user_settings')
+    .update({
+      vercel_token: null,
+      vercel_team_id: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}

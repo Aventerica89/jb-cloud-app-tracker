@@ -2,6 +2,15 @@
 export type AppStatus = 'active' | 'inactive' | 'archived' | 'maintenance'
 export type DeploymentStatus = 'pending' | 'building' | 'deployed' | 'failed' | 'rolled_back'
 
+// User Settings
+export interface UserSettings {
+  user_id: string
+  vercel_token: string | null
+  vercel_team_id: string | null
+  created_at: string
+  updated_at: string
+}
+
 // Base types (from database)
 export interface CloudProvider {
   id: string
@@ -29,6 +38,7 @@ export interface Application {
   repository_url: string | null
   tech_stack: string[]
   status: AppStatus
+  vercel_project_id: string | null
   created_at: string
   updated_at: string
 }
@@ -42,6 +52,7 @@ export interface Deployment {
   branch: string | null
   commit_sha: string | null
   status: DeploymentStatus
+  external_id: string | null
   deployed_at: string
   created_at: string
 }
@@ -77,6 +88,7 @@ export interface CreateApplicationInput {
   tech_stack?: string[]
   status?: AppStatus
   tag_ids?: string[]
+  vercel_project_id?: string
 }
 
 export interface UpdateApplicationInput {
@@ -87,6 +99,7 @@ export interface UpdateApplicationInput {
   tech_stack?: string[]
   status?: AppStatus
   tag_ids?: string[]
+  vercel_project_id?: string
 }
 
 export interface CreateDeploymentInput {
@@ -110,4 +123,25 @@ export interface CreateProviderInput {
 export interface CreateTagInput {
   name: string
   color?: string
+}
+
+// Vercel API types
+export interface VercelProject {
+  id: string
+  name: string
+  framework: string | null
+  updatedAt: number
+}
+
+export interface VercelDeployment {
+  uid: string
+  name: string
+  url: string | null
+  state: 'READY' | 'ERROR' | 'BUILDING' | 'QUEUED' | 'CANCELED' | 'INITIALIZING'
+  target: 'production' | 'preview' | null
+  createdAt: number
+  meta?: {
+    githubCommitRef?: string
+    githubCommitSha?: string
+  }
 }

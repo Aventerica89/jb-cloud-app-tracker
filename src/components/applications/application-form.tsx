@@ -18,15 +18,17 @@ import {
   createApplication,
   updateApplication,
 } from '@/lib/actions/applications'
+import { VercelProjectSelect } from './vercel-project-select'
 import { toast } from 'sonner'
 import type { Application, Tag, AppStatus } from '@/types/database'
 
 interface ApplicationFormProps {
   application?: Application & { tags?: Tag[] }
   tags: Tag[]
+  hasVercelToken?: boolean
 }
 
-export function ApplicationForm({ application, tags }: ApplicationFormProps) {
+export function ApplicationForm({ application, tags, hasVercelToken = false }: ApplicationFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<AppStatus>(
@@ -34,6 +36,9 @@ export function ApplicationForm({ application, tags }: ApplicationFormProps) {
   )
   const [selectedTags, setSelectedTags] = useState<string[]>(
     application?.tags?.map((t) => t.id) || []
+  )
+  const [vercelProjectId, setVercelProjectId] = useState<string>(
+    application?.vercel_project_id || ''
   )
 
   const isEditing = !!application
@@ -43,6 +48,7 @@ export function ApplicationForm({ application, tags }: ApplicationFormProps) {
 
     formData.set('status', status)
     formData.set('tag_ids', selectedTags.join(','))
+    formData.set('vercel_project_id', vercelProjectId)
 
     if (isEditing) {
       formData.set('id', application.id)
@@ -172,6 +178,12 @@ export function ApplicationForm({ application, tags }: ApplicationFormProps) {
           </div>
         </div>
       )}
+
+      <VercelProjectSelect
+        value={vercelProjectId}
+        onChange={setVercelProjectId}
+        hasToken={hasVercelToken}
+      />
 
       <div className="flex justify-end gap-4">
         <Button
