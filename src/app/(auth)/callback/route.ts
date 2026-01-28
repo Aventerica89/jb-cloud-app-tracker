@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 
 function isValidRedirect(path: string): boolean {
-  // Must start with / but not // (protocol-relative URL)
-  // Must not contain protocol or encoded characters that could bypass validation
   return (
     path.startsWith('/') &&
     !path.startsWith('//') &&
@@ -18,18 +16,39 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
-
-  // Validate redirect to prevent open redirect attacks
   const safeNext = isValidRedirect(next) ? next : '/dashboard'
 
   if (code) {
-    const supabase = await createClient()
+    const response = NextResponse.redirect(`${origin}${safeNext}`)
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.headers.get('cookie')?.split('; ').map(cookie => {
+              const [name, value] = cookie.split('=')
+              return { name, value }
+            }) ?? []
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+
     if (!error) {
-      return NextResponse.redirect(`${origin}${safeNext}`)
+      return response
     }
+
+    console.error('OAuth callback error:', error.message)
   }
 
-  // Return the user to an error page with instructions
   return NextResponse.redirect(`${origin}/login?error=Could not authenticate`)
 }
