@@ -95,7 +95,6 @@ export function DeploymentCard({ deployment }: DeploymentCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm text-primary hover:underline"
-              onClick={(e) => e.stopPropagation()}
             >
               Visit
               <ExternalLink className="h-3 w-3" />
