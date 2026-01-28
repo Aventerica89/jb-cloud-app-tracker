@@ -141,7 +141,7 @@ See `docs/PLAN.md` for detailed implementation plan.
 - [x] Phase 3: Deployments
 - [x] Phase 4: Dashboard
 - [x] Phase 5: Polish (search, dark mode)
-- [ ] Phase 6: Launch (testing, deploy)
+- [x] Phase 6: Launch (testing, deploy)
 
 ---
 
@@ -173,3 +173,23 @@ See `docs/PLAN.md` for detailed implementation plan.
 - Immutable patterns (never mutate)
 - Small files (200-400 lines typical)
 - 80%+ test coverage target
+
+---
+
+## Deployment
+
+### Vercel Deployment
+
+1. Push to GitHub repository
+2. Import project in Vercel dashboard
+3. Add environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_APP_URL` (your Vercel domain)
+4. Deploy
+
+### Supabase Configuration
+
+1. Update Supabase Auth settings with production URL:
+   - Site URL: `https://your-app.vercel.app`
+   - Redirect URLs: `https://your-app.vercel.app/callback`
