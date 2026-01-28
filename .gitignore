@@ -60,3 +60,4 @@ test-results/
 
 # Keep .env.example but ignore actual env files
 !.env.example
+.env*.local

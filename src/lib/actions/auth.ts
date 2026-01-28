@@ -81,3 +81,49 @@ export async function signOut(): Promise<void> {
   revalidatePath('/', 'layout')
   redirect('/login')
 }
+
+export async function resetPasswordRequest(formData: FormData): Promise<ActionResult> {
+  const supabase = await createClient()
+  const email = formData.get('email') as string
+
+  if (!email) {
+    return { success: false, error: 'Email is required' }
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+  })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+export async function updatePassword(formData: FormData): Promise<ActionResult> {
+  const supabase = await createClient()
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (!password || !confirmPassword) {
+    return { success: false, error: 'Password is required' }
+  }
+
+  if (password.length < 6) {
+    return { success: false, error: 'Password must be at least 6 characters' }
+  }
+
+  if (password !== confirmPassword) {
+    return { success: false, error: 'Passwords do not match' }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/login?message=Password updated successfully')
+}
