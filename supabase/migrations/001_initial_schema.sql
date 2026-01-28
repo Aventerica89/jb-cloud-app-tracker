@@ -101,10 +101,14 @@ CREATE TRIGGER applications_updated_at
     EXECUTE FUNCTION update_updated_at();
 
 -- Function to seed default providers on user signup
-CREATE OR REPLACE FUNCTION seed_user_providers()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION public.seed_user_providers()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-    INSERT INTO cloud_providers (user_id, name, slug, icon_name, base_url) VALUES
+    INSERT INTO public.cloud_providers (user_id, name, slug, icon_name, base_url) VALUES
         (NEW.id, 'Vercel', 'vercel', 'triangle', 'https://vercel.com'),
         (NEW.id, 'Cloudflare', 'cloudflare', 'cloud', 'https://cloudflare.com'),
         (NEW.id, 'Railway', 'railway', 'train-front', 'https://railway.app'),
@@ -117,13 +121,16 @@ BEGIN
         (NEW.id, 'Render', 'render', 'server', 'https://render.com');
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+-- Set proper ownership
+ALTER FUNCTION public.seed_user_providers() OWNER TO postgres;
 
 -- Trigger to seed providers when a new user signs up
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
-    EXECUTE FUNCTION seed_user_providers();
+    EXECUTE FUNCTION public.seed_user_providers();
 
 -- Row Level Security (RLS)
 ALTER TABLE cloud_providers ENABLE ROW LEVEL SECURITY;
