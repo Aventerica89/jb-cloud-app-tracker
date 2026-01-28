@@ -8,6 +8,7 @@ import { Plus, AppWindow } from 'lucide-react'
 import { getApplications } from '@/lib/actions/applications'
 import { AppCard } from '@/components/applications/app-card'
 import { AppFilters } from '@/components/applications/app-filters'
+import { GitHubImportButton } from '@/components/applications/github-import-button'
 
 interface Props {
   searchParams: Promise<{ search?: string; status?: string }>
@@ -93,12 +94,15 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         title="Applications"
         description="Manage your cloud applications"
       >
-        <Link href="/applications/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Application
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <GitHubImportButton />
+          <Link href="/applications/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Application
+            </Button>
+          </Link>
+        </div>
       </Header>
 
       <div className="flex-1 p-6">

@@ -1,7 +1,9 @@
-import Link from 'next/link'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ExternalLink, GitBranch } from 'lucide-react'
+import { ExternalLink, GitBranch, Globe } from 'lucide-react'
 import type { ApplicationWithRelations } from '@/types/database'
 
 const statusColors = {
@@ -16,83 +18,104 @@ interface AppCardProps {
 }
 
 export function AppCard({ app }: AppCardProps) {
+  const router = useRouter()
+
+  function handleCardClick() {
+    router.push(`/applications/${app.id}`)
+  }
+
   return (
-    <Link href={`/applications/${app.id}`}>
-      <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-lg line-clamp-1">{app.name}</CardTitle>
-            <Badge
-              variant="outline"
-              className={statusColors[app.status]}
+    <Card
+      className="hover:border-primary/50 transition-colors cursor-pointer h-full"
+      onClick={handleCardClick}
+    >
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-lg line-clamp-1">{app.name}</CardTitle>
+          <Badge variant="outline" className={statusColors[app.status]}>
+            {app.status}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {app.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {app.description}
+          </p>
+        )}
+
+        {app.tech_stack && app.tech_stack.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {app.tech_stack.slice(0, 4).map((tech) => (
+              <Badge key={tech} variant="secondary" className="text-xs">
+                {tech}
+              </Badge>
+            ))}
+            {app.tech_stack.length > 4 && (
+              <Badge variant="secondary" className="text-xs">
+                +{app.tech_stack.length - 4}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {app.tags && app.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {app.tags.slice(0, 3).map((tag) => (
+              <Badge
+                key={tag.id}
+                variant="outline"
+                className="text-xs"
+                style={{
+                  backgroundColor: `${tag.color}15`,
+                  borderColor: `${tag.color}40`,
+                  color: tag.color,
+                }}
+              >
+                {tag.name}
+              </Badge>
+            ))}
+            {app.tags.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{app.tags.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 text-xs text-muted-foreground pt-2">
+          {app.live_url && (
+            <a
+              href={app.live_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-primary hover:underline"
+              onClick={(e) => e.stopPropagation()}
             >
-              {app.status}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {app.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {app.description}
-            </p>
+              <Globe className="h-3 w-3" />
+              Live
+            </a>
           )}
-
-          {app.tech_stack && app.tech_stack.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {app.tech_stack.slice(0, 4).map((tech) => (
-                <Badge key={tech} variant="secondary" className="text-xs">
-                  {tech}
-                </Badge>
-              ))}
-              {app.tech_stack.length > 4 && (
-                <Badge variant="secondary" className="text-xs">
-                  +{app.tech_stack.length - 4}
-                </Badge>
-              )}
-            </div>
+          {app.repository_url && (
+            <a
+              href={app.repository_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-foreground"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GitBranch className="h-3 w-3" />
+              Repo
+            </a>
           )}
-
-          {app.tags && app.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {app.tags.slice(0, 3).map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant="outline"
-                  className="text-xs"
-                  style={{
-                    backgroundColor: `${tag.color}15`,
-                    borderColor: `${tag.color}40`,
-                    color: tag.color,
-                  }}
-                >
-                  {tag.name}
-                </Badge>
-              ))}
-              {app.tags.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{app.tags.length - 3}
-                </Badge>
-              )}
-            </div>
+          {app.deployments && app.deployments.length > 0 && (
+            <span className="flex items-center gap-1">
+              <ExternalLink className="h-3 w-3" />
+              {app.deployments.length} deployment{app.deployments.length !== 1 ? 's' : ''}
+            </span>
           )}
-
-          <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2">
-            {app.repository_url && (
-              <span className="flex items-center gap-1">
-                <GitBranch className="h-3 w-3" />
-                Repository
-              </span>
-            )}
-            {app.deployments && app.deployments.length > 0 && (
-              <span className="flex items-center gap-1">
-                <ExternalLink className="h-3 w-3" />
-                {app.deployments.length} deployment
-                {app.deployments.length !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -38,6 +38,7 @@ export interface Application {
   name: string
   description: string | null
   repository_url: string | null
+  live_url: string | null
   tech_stack: string[]
   status: AppStatus
   vercel_project_id: string | null
@@ -88,6 +89,7 @@ export interface CreateApplicationInput {
   name: string
   description?: string
   repository_url?: string
+  live_url?: string
   tech_stack?: string[]
   status?: AppStatus
   tag_ids?: string[]
@@ -100,6 +102,7 @@ export interface UpdateApplicationInput {
   name?: string
   description?: string
   repository_url?: string
+  live_url?: string
   tech_stack?: string[]
   status?: AppStatus
   tag_ids?: string[]

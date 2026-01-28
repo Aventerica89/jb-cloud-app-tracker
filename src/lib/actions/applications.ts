@@ -114,6 +114,7 @@ export async function createApplication(
     name: formData.get('name'),
     description: formData.get('description') || undefined,
     repository_url: formData.get('repository_url') || undefined,
+    live_url: formData.get('live_url') || undefined,
     tech_stack: techStackRaw
       ? String(techStackRaw)
           .split(',')
@@ -139,13 +140,14 @@ export async function createApplication(
     }
   }
 
-  const { tag_ids, vercel_project_id, cloudflare_project_name, ...applicationData } = parsed.data
+  const { tag_ids, vercel_project_id, cloudflare_project_name, live_url, ...applicationData } = parsed.data
 
   const { data, error } = await supabase
     .from('applications')
     .insert({
       ...applicationData,
       user_id: user.id,
+      live_url: live_url || null,
       vercel_project_id: vercel_project_id || null,
       cloudflare_project_name: cloudflare_project_name || null,
     })
@@ -194,6 +196,7 @@ export async function updateApplication(
     name: formData.get('name') || undefined,
     description: formData.get('description'),
     repository_url: formData.get('repository_url'),
+    live_url: formData.get('live_url'),
     tech_stack: techStackRaw
       ? String(techStackRaw)
           .split(',')
@@ -219,12 +222,13 @@ export async function updateApplication(
     }
   }
 
-  const { id, tag_ids, vercel_project_id, cloudflare_project_name, ...updateData } = parsed.data
+  const { id, tag_ids, vercel_project_id, cloudflare_project_name, live_url, ...updateData } = parsed.data
 
   const { error } = await supabase
     .from('applications')
     .update({
       ...updateData,
+      live_url: live_url === '' ? null : live_url,
       vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
       cloudflare_project_name: cloudflare_project_name === '' ? null : cloudflare_project_name,
     })

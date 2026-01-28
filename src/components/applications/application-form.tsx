@@ -128,6 +128,20 @@ export function ApplicationForm({ application, tags, hasVercelToken = false, has
       </div>
 
       <div className="grid gap-2">
+        <Label htmlFor="live_url">Live URL</Label>
+        <Input
+          id="live_url"
+          name="live_url"
+          type="url"
+          placeholder="https://myapp.vercel.app"
+          defaultValue={application?.live_url || ''}
+        />
+        <p className="text-xs text-muted-foreground">
+          Production URL where the app is deployed
+        </p>
+      </div>
+
+      <div className="grid gap-2">
         <Label htmlFor="tech_stack">Tech Stack</Label>
         <Input
           id="tech_stack"
