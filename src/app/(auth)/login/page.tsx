@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { signIn, signInWithGoogle } from '@/lib/actions/auth'
+import { signIn } from '@/lib/actions/auth'
 import { toast } from 'sonner'
 
 function GoogleIcon() {
@@ -62,16 +62,9 @@ function LoginForm() {
     // If successful, the action will redirect
   }
 
-  async function handleGoogleSignIn() {
+  function handleGoogleSignIn() {
     setIsGoogleLoading(true)
-    const result = await signInWithGoogle()
-
-    if ('error' in result) {
-      toast.error(result.error)
-      setIsGoogleLoading(false)
-    } else {
-      window.location.href = result.url
-    }
+    window.location.href = '/login/google'
   }
 
   return (

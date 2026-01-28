@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { signUp, signInWithGoogle } from '@/lib/actions/auth'
+import { signUp } from '@/lib/actions/auth'
 import { toast } from 'sonner'
 
 function GoogleIcon() {
@@ -59,16 +59,9 @@ export default function SignUpPage() {
     setIsLoading(false)
   }
 
-  async function handleGoogleSignIn() {
+  function handleGoogleSignIn() {
     setIsGoogleLoading(true)
-    const result = await signInWithGoogle()
-
-    if ('error' in result) {
-      toast.error(result.error)
-      setIsGoogleLoading(false)
-    } else {
-      window.location.href = result.url
-    }
+    window.location.href = '/login/google'
   }
 
   if (isSuccess) {
