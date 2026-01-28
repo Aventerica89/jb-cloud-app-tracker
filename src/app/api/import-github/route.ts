@@ -185,6 +185,8 @@ export async function POST(request: Request) {
 
     const tagCache = new Map<string, string>()
 
+    const userId = user.id
+
     async function getOrCreateTag(name: string): Promise<string> {
       if (tagCache.has(name)) return tagCache.get(name)!
 
@@ -192,7 +194,7 @@ export async function POST(request: Request) {
       const { data: existing } = await supabase
         .from('tags')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('name', name)
         .single()
 
@@ -205,7 +207,7 @@ export async function POST(request: Request) {
       const { data: newTag } = await supabase
         .from('tags')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           name,
           color: tagColors[name] || '#6b7280',
         })
