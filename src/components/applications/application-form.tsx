@@ -19,6 +19,7 @@ import {
   updateApplication,
 } from '@/lib/actions/applications'
 import { VercelProjectSelect } from './vercel-project-select'
+import { CloudflareProjectSelect } from './cloudflare-project-select'
 import { toast } from 'sonner'
 import type { Application, Tag, AppStatus } from '@/types/database'
 
@@ -26,9 +27,10 @@ interface ApplicationFormProps {
   application?: Application & { tags?: Tag[] }
   tags: Tag[]
   hasVercelToken?: boolean
+  hasCloudflareToken?: boolean
 }
 
-export function ApplicationForm({ application, tags, hasVercelToken = false }: ApplicationFormProps) {
+export function ApplicationForm({ application, tags, hasVercelToken = false, hasCloudflareToken = false }: ApplicationFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<AppStatus>(
@@ -40,6 +42,9 @@ export function ApplicationForm({ application, tags, hasVercelToken = false }: A
   const [vercelProjectId, setVercelProjectId] = useState<string>(
     application?.vercel_project_id || ''
   )
+  const [cloudflareProjectName, setCloudflareProjectName] = useState<string>(
+    application?.cloudflare_project_name || ''
+  )
 
   const isEditing = !!application
 
@@ -49,6 +54,7 @@ export function ApplicationForm({ application, tags, hasVercelToken = false }: A
     formData.set('status', status)
     formData.set('tag_ids', selectedTags.join(','))
     formData.set('vercel_project_id', vercelProjectId)
+    formData.set('cloudflare_project_name', cloudflareProjectName)
 
     if (isEditing) {
       formData.set('id', application.id)
@@ -183,6 +189,12 @@ export function ApplicationForm({ application, tags, hasVercelToken = false }: A
         value={vercelProjectId}
         onChange={setVercelProjectId}
         hasToken={hasVercelToken}
+      />
+
+      <CloudflareProjectSelect
+        value={cloudflareProjectName}
+        onChange={setCloudflareProjectName}
+        hasToken={hasCloudflareToken}
       />
 
       <div className="flex justify-end gap-4">

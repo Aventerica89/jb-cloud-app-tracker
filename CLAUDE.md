@@ -53,6 +53,7 @@ src/
 │   │   ├── applications/ # App management
 │   │   ├── deployments/  # Deployment tracking
 │   │   ├── providers/    # Provider config
+│   │   ├── settings/     # User settings (API tokens)
 │   │   └── tags/         # Tag management
 ├── components/
 │   ├── ui/               # v0/shadcn components
@@ -79,6 +80,7 @@ src/
 - **environments** - Shared table (dev, staging, production)
 - **tags** - User-owned labels for organizing apps
 - **application_tags** - Junction table for many-to-many
+- **user_settings** - API tokens for provider integrations
 
 ### Key Relationships
 
@@ -142,6 +144,9 @@ See `docs/PLAN.md` for detailed implementation plan.
 - [x] Phase 4: Dashboard
 - [x] Phase 5: Polish (search, dark mode)
 - [x] Phase 6: Launch (testing, deploy)
+- [x] Phase 7: Vercel Integration (API sync)
+- [x] Phase 8: Cloudflare Integration (API sync)
+- [x] Phase 9: Auto-sync deployments on page view
 
 ---
 
@@ -193,3 +198,70 @@ See `docs/PLAN.md` for detailed implementation plan.
 1. Update Supabase Auth settings with production URL:
    - Site URL: `https://your-app.vercel.app`
    - Redirect URLs: `https://your-app.vercel.app/callback`
+
+---
+
+## Provider Integrations
+
+### Vercel Integration
+
+Sync deployments automatically from Vercel:
+
+1. Go to **Settings** and add your Vercel API token
+   - Get token from: https://vercel.com/account/tokens
+2. Edit an application and select a **Vercel Project** from dropdown
+3. Click **Sync Vercel** on app detail page to import deployments
+
+**Status Mapping:**
+| Vercel State | Local Status |
+|--------------|--------------|
+| READY | deployed |
+| ERROR | failed |
+| BUILDING | building |
+| QUEUED | pending |
+| CANCELED | rolled_back |
+
+**Files:**
+- `src/lib/actions/vercel.ts` - Vercel API client
+- `src/lib/actions/sync.ts` - Deployment sync logic
+- `src/lib/actions/settings.ts` - Token storage
+- `src/components/settings/vercel-token-form.tsx` - Token UI
+
+### Cloudflare Integration
+
+Sync deployments automatically from Cloudflare Pages:
+
+1. Go to **Settings** and add your Cloudflare API token and Account ID
+   - Get token from: https://dash.cloudflare.com/profile/api-tokens
+   - Token needs "Cloudflare Pages:Read" permission
+   - Find Account ID in your Cloudflare dashboard URL or Workers & Pages overview
+2. Edit an application and select a **Cloudflare Pages Project** from dropdown
+3. Click **Sync Cloudflare** on app detail page to import deployments
+
+**Status Mapping:**
+| Cloudflare Stage | Local Status |
+|------------------|--------------|
+| deploy + success | deployed |
+| failure | failed |
+| canceled | rolled_back |
+| active | building |
+| other | pending |
+
+**Files:**
+- `src/lib/actions/cloudflare.ts` - Cloudflare API client
+- `src/lib/actions/sync.ts` - Deployment sync logic (shared with Vercel)
+- `src/lib/actions/settings.ts` - Token storage
+- `src/components/settings/cloudflare-token-form.tsx` - Token UI
+- `src/components/applications/cloudflare-project-select.tsx` - Project selector
+
+### Auto-Sync
+
+Deployments are automatically synced when viewing an application detail page:
+
+- Triggers 500ms after page load (non-blocking)
+- Syncs both Vercel and Cloudflare in parallel if configured
+- Refreshes the page data after sync completes
+- Manual sync buttons still available for on-demand refresh
+
+**Files:**
+- `src/components/applications/auto-sync.tsx` - Auto-sync client component

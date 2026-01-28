@@ -29,8 +29,13 @@ export async function getApplications(
   )
 
   if (options.search) {
+    // Sanitize search input to prevent filter injection
+    // Escape special PostgREST characters and SQL wildcards
+    const sanitizedSearch = options.search
+      .replace(/[\\%_]/g, '\\$&')  // Escape SQL wildcards
+      .replace(/[(),.:]/g, '')     // Remove PostgREST special chars
     query = query.or(
-      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
+      `name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`
     )
   }
 
@@ -122,6 +127,7 @@ export async function createApplication(
           .filter(Boolean)
       : [],
     vercel_project_id: formData.get('vercel_project_id') || undefined,
+    cloudflare_project_name: formData.get('cloudflare_project_name') || undefined,
   }
 
   const parsed = createApplicationSchema.safeParse(rawData)
@@ -133,7 +139,7 @@ export async function createApplication(
     }
   }
 
-  const { tag_ids, vercel_project_id, ...applicationData } = parsed.data
+  const { tag_ids, vercel_project_id, cloudflare_project_name, ...applicationData } = parsed.data
 
   const { data, error } = await supabase
     .from('applications')
@@ -141,6 +147,7 @@ export async function createApplication(
       ...applicationData,
       user_id: user.id,
       vercel_project_id: vercel_project_id || null,
+      cloudflare_project_name: cloudflare_project_name || null,
     })
     .select('id')
     .single()
@@ -200,6 +207,7 @@ export async function updateApplication(
           .filter(Boolean)
       : undefined,
     vercel_project_id: formData.get('vercel_project_id'),
+    cloudflare_project_name: formData.get('cloudflare_project_name'),
   }
 
   const parsed = updateApplicationSchema.safeParse(rawData)
@@ -211,13 +219,14 @@ export async function updateApplication(
     }
   }
 
-  const { id, tag_ids, vercel_project_id, ...updateData } = parsed.data
+  const { id, tag_ids, vercel_project_id, cloudflare_project_name, ...updateData } = parsed.data
 
   const { error } = await supabase
     .from('applications')
     .update({
       ...updateData,
       vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
+      cloudflare_project_name: cloudflare_project_name === '' ? null : cloudflare_project_name,
     })
     .eq('id', id)
 

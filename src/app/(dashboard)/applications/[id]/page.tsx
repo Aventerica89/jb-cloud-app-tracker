@@ -14,6 +14,7 @@ import {
 import { getApplication } from '@/lib/actions/applications'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
 import { SyncButton } from '@/components/applications/sync-button'
+import { AutoSync } from '@/components/applications/auto-sync'
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -36,6 +37,11 @@ export default async function ApplicationDetailPage({ params }: Props) {
 
   return (
     <div className="flex flex-col h-full">
+      <AutoSync
+        applicationId={app.id}
+        hasVercelProject={!!app.vercel_project_id}
+        hasCloudflareProject={!!app.cloudflare_project_name}
+      />
       <Header title={app.name} description={app.description || undefined}>
         <div className="flex items-center gap-2">
           <Link href="/applications">
@@ -120,6 +126,7 @@ export default async function ApplicationDetailPage({ params }: Props) {
               <SyncButton
                 applicationId={app.id}
                 hasVercelProject={!!app.vercel_project_id}
+                hasCloudflareProject={!!app.cloudflare_project_name}
               />
               <Link href={`/deployments/new?app=${app.id}`}>
                 <Button size="sm">

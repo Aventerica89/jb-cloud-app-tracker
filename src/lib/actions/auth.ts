@@ -5,6 +5,20 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/types/actions'
 
+function isValidRedirect(path: string | null): boolean {
+  if (!path) return false
+  // Must start with / but not // (protocol-relative URL)
+  // Must not contain protocol or encoded characters that could bypass validation
+  return (
+    path.startsWith('/') &&
+    !path.startsWith('//') &&
+    !path.includes('://') &&
+    !path.includes('%2f') &&
+    !path.includes('%2F') &&
+    !path.includes('\\')
+  )
+}
+
 export async function signUp(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient()
 
@@ -55,7 +69,10 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
   }
 
   revalidatePath('/', 'layout')
-  redirect(redirectTo || '/dashboard')
+
+  // Validate redirect to prevent open redirect attacks
+  const safeRedirect = isValidRedirect(redirectTo) ? redirectTo! : '/dashboard'
+  redirect(safeRedirect)
 }
 
 export async function signOut(): Promise<void> {

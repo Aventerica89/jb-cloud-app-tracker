@@ -10,6 +10,7 @@ export const createApplicationSchema = z.object({
   status: appStatusSchema.default('active'),
   tag_ids: z.array(z.string().uuid()).default([]),
   vercel_project_id: z.string().optional().or(z.literal('')),
+  cloudflare_project_name: z.string().optional().or(z.literal('')),
 })
 
 export const updateApplicationSchema = z.object({
@@ -21,6 +22,7 @@ export const updateApplicationSchema = z.object({
   status: appStatusSchema.optional(),
   tag_ids: z.array(z.string().uuid()).optional(),
   vercel_project_id: z.string().optional().or(z.literal('')).nullable(),
+  cloudflare_project_name: z.string().optional().or(z.literal('')).nullable(),
 })
 
 export type CreateApplicationInput = z.infer<typeof createApplicationSchema>

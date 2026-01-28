@@ -32,6 +32,11 @@ export async function hasVercelToken(): Promise<boolean> {
   return !!settings?.vercel_token
 }
 
+export async function hasCloudflareToken(): Promise<boolean> {
+  const settings = await getUserSettings()
+  return !!settings?.cloudflare_token && !!settings?.cloudflare_account_id
+}
+
 export async function saveVercelSettings(
   formData: FormData
 ): Promise<ActionResult> {
@@ -85,6 +90,72 @@ export async function deleteVercelSettings(): Promise<ActionResult> {
     .update({
       vercel_token: null,
       vercel_team_id: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}
+
+export async function saveCloudflareSettings(
+  formData: FormData
+): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const cloudflareToken = formData.get('cloudflare_token') as string
+  const cloudflareAccountId = formData.get('cloudflare_account_id') as string
+
+  if (!cloudflareToken || !cloudflareAccountId) {
+    return { success: false, error: 'Cloudflare token and account ID are required' }
+  }
+
+  const { error } = await supabase.from('user_settings').upsert(
+    {
+      user_id: user.id,
+      cloudflare_token: cloudflareToken,
+      cloudflare_account_id: cloudflareAccountId,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' }
+  )
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}
+
+export async function deleteCloudflareSettings(): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const { error } = await supabase
+    .from('user_settings')
+    .update({
+      cloudflare_token: null,
+      cloudflare_account_id: null,
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', user.id)

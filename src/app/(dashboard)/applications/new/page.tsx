@@ -4,11 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
 import { getTags } from '@/lib/actions/tags'
-import { hasVercelToken } from '@/lib/actions/settings'
+import { hasVercelToken, hasCloudflareToken } from '@/lib/actions/settings'
 import { ApplicationForm } from '@/components/applications/application-form'
 
 export default async function NewApplicationPage() {
-  const [tags, hasToken] = await Promise.all([getTags(), hasVercelToken()])
+  const [tags, hasVercel, hasCloudflare] = await Promise.all([
+    getTags(),
+    hasVercelToken(),
+    hasCloudflareToken(),
+  ])
 
   return (
     <div className="flex flex-col h-full">
@@ -24,7 +28,7 @@ export default async function NewApplicationPage() {
       <div className="flex-1 p-6">
         <Card className="max-w-2xl">
           <CardContent className="pt-6">
-            <ApplicationForm tags={tags} hasVercelToken={hasToken} />
+            <ApplicationForm tags={tags} hasVercelToken={hasVercel} hasCloudflareToken={hasCloudflare} />
           </CardContent>
         </Card>
       </div>

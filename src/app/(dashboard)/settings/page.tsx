@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/header'
 import { VercelTokenForm } from '@/components/settings/vercel-token-form'
+import { CloudflareTokenForm } from '@/components/settings/cloudflare-token-form'
 import { getUserSettings } from '@/lib/actions/settings'
 
 export default async function SettingsPage() {
@@ -16,6 +17,10 @@ export default async function SettingsPage() {
         <VercelTokenForm
           hasToken={!!settings?.vercel_token}
           currentTeamId={settings?.vercel_team_id}
+        />
+        <CloudflareTokenForm
+          hasToken={!!settings?.cloudflare_token}
+          currentAccountId={settings?.cloudflare_account_id}
         />
       </div>
     </div>

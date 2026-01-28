@@ -7,6 +7,8 @@ export interface UserSettings {
   user_id: string
   vercel_token: string | null
   vercel_team_id: string | null
+  cloudflare_token: string | null
+  cloudflare_account_id: string | null
   created_at: string
   updated_at: string
 }
@@ -39,6 +41,7 @@ export interface Application {
   tech_stack: string[]
   status: AppStatus
   vercel_project_id: string | null
+  cloudflare_project_name: string | null
   created_at: string
   updated_at: string
 }
@@ -89,6 +92,7 @@ export interface CreateApplicationInput {
   status?: AppStatus
   tag_ids?: string[]
   vercel_project_id?: string
+  cloudflare_project_name?: string
 }
 
 export interface UpdateApplicationInput {
@@ -100,6 +104,7 @@ export interface UpdateApplicationInput {
   status?: AppStatus
   tag_ids?: string[]
   vercel_project_id?: string
+  cloudflare_project_name?: string
 }
 
 export interface CreateDeploymentInput {
@@ -144,4 +149,30 @@ export interface VercelDeployment {
     githubCommitRef?: string
     githubCommitSha?: string
   }
+}
+
+// Cloudflare API types
+export interface CloudflareProject {
+  name: string
+  subdomain: string
+  production_branch: string
+  created_on: string
+}
+
+export interface CloudflareDeployment {
+  id: string
+  project_name: string
+  url: string | null
+  environment: 'production' | 'preview'
+  deployment_trigger: {
+    metadata?: {
+      branch?: string
+      commit_hash?: string
+    }
+  }
+  latest_stage: {
+    name: string
+    status: 'active' | 'idle' | 'canceled' | 'failure' | 'success'
+  }
+  created_on: string
 }
