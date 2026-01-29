@@ -1,0 +1,19 @@
+{
+  "name": "Cloud App Tracker",
+  "short_name": "Cloud Tracker",
+  "description": "Track and manage your cloud applications across multiple providers",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
