@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { changelog, type ChangelogEntry } from '@/lib/changelog'
 
 const typeConfig = {
@@ -85,13 +84,11 @@ export function Changelog() {
         <CardDescription>Recent updates and improvements</CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-6">
-            {changelog.map((entry) => (
-              <ChangelogVersion key={entry.version} entry={entry} />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="max-h-[300px] overflow-y-auto pr-4 space-y-6">
+          {changelog.map((entry) => (
+            <ChangelogVersion key={entry.version} entry={entry} />
+          ))}
+        </div>
       </CardContent>
     </Card>
   )
