@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 
 export interface CurrentUser {
@@ -8,6 +9,19 @@ export interface CurrentUser {
   email: string
   name: string | null
   avatarUrl: string | null
+}
+
+function mapAuthUserToCurrentUser(authUser: User | null | undefined): CurrentUser | null {
+  if (!authUser) {
+    return null
+  }
+  const metadata = authUser.user_metadata || {}
+  return {
+    id: authUser.id,
+    email: authUser.email || '',
+    name: metadata.full_name || metadata.name || metadata.preferred_username || null,
+    avatarUrl: metadata.avatar_url || metadata.picture || null,
+  }
 }
 
 export function useCurrentUser() {
@@ -22,15 +36,7 @@ export function useCurrentUser() {
         data: { user: authUser },
       } = await supabase.auth.getUser()
 
-      if (authUser) {
-        const metadata = authUser.user_metadata || {}
-        setUser({
-          id: authUser.id,
-          email: authUser.email || '',
-          name: metadata.full_name || metadata.name || null,
-          avatarUrl: metadata.avatar_url || metadata.picture || null,
-        })
-      }
+      setUser(mapAuthUserToCurrentUser(authUser))
       setLoading(false)
     }
 
@@ -39,17 +45,7 @@ export function useCurrentUser() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const metadata = session.user.user_metadata || {}
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          name: metadata.full_name || metadata.name || null,
-          avatarUrl: metadata.avatar_url || metadata.picture || null,
-        })
-      } else {
-        setUser(null)
-      }
+      setUser(mapAuthUserToCurrentUser(session?.user))
     })
 
     return () => subscription.unsubscribe()
