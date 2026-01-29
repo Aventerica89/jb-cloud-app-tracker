@@ -15,6 +15,14 @@ import { getApplication } from '@/lib/actions/applications'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
 import { SyncButton } from '@/components/applications/sync-button'
 import { AutoSync } from '@/components/applications/auto-sync'
+import { MaintenanceChecklist } from '@/components/maintenance/maintenance-checklist'
+import { MaintenanceHistory } from '@/components/maintenance/maintenance-history'
+import { AddMaintenanceRunDialog } from '@/components/maintenance/add-maintenance-run-dialog'
+import {
+  getLatestMaintenanceStatus,
+  getMaintenanceRuns,
+  getMaintenanceCommandTypes,
+} from '@/lib/actions/maintenance'
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -34,6 +42,13 @@ export default async function ApplicationDetailPage({ params }: Props) {
   if (!app) {
     notFound()
   }
+
+  // Fetch maintenance data in parallel
+  const [maintenanceStatus, maintenanceRuns, commandTypes] = await Promise.all([
+    getLatestMaintenanceStatus(id),
+    getMaintenanceRuns(id),
+    getMaintenanceCommandTypes(),
+  ])
 
   return (
     <div className="flex flex-col h-full">
@@ -176,6 +191,22 @@ export default async function ApplicationDetailPage({ params }: Props) {
             )}
           </CardContent>
         </Card>
+
+        {/* Maintenance */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Maintenance</h2>
+          <AddMaintenanceRunDialog
+            applicationId={app.id}
+            commandTypes={commandTypes}
+          />
+        </div>
+
+        <MaintenanceChecklist
+          applicationId={app.id}
+          statuses={maintenanceStatus}
+        />
+
+        <MaintenanceHistory runs={maintenanceRuns} />
       </div>
     </div>
   )

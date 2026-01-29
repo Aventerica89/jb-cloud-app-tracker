@@ -1,6 +1,7 @@
 // Enums
 export type AppStatus = 'active' | 'inactive' | 'archived' | 'maintenance'
 export type DeploymentStatus = 'pending' | 'building' | 'deployed' | 'failed' | 'rolled_back'
+export type MaintenanceStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
 
 // User Settings
 export interface UserSettings {
@@ -73,6 +74,30 @@ export interface ApplicationTag {
   tag_id: string
 }
 
+export interface MaintenanceCommandType {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  recommended_frequency_days: number
+  icon: string | null
+  color: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+}
+
+export interface MaintenanceRun {
+  id: string
+  application_id: string
+  command_type_id: string
+  status: MaintenanceStatus
+  results: Record<string, unknown> | null
+  notes: string | null
+  run_at: string
+  created_at: string
+}
+
 // Extended types (with relations)
 export interface ApplicationWithRelations extends Application {
   deployments: DeploymentWithRelations[]
@@ -82,6 +107,19 @@ export interface ApplicationWithRelations extends Application {
 export interface DeploymentWithRelations extends Deployment {
   provider: CloudProvider
   environment: Environment
+}
+
+export interface MaintenanceRunWithRelations extends MaintenanceRun {
+  command_type: MaintenanceCommandType
+}
+
+export interface MaintenanceStatusItem {
+  command_type: MaintenanceCommandType
+  last_run_at: string | null
+  last_status: string | null
+  days_since_run: number | null
+  is_overdue: boolean
+  never_run: boolean
 }
 
 // Input types (for forms/mutations)
