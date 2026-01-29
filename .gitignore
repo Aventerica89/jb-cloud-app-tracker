@@ -58,6 +58,7 @@ test-results/
 # Turbo
 .turbo
 
-# Keep .env.example but ignore actual env files
+# Keep .env.example and .env templates but ignore actual env files
 !.env.example
+!.env*.tpl
 .env*.local

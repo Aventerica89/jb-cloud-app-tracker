@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { BlurBlobBg } from '@/components/ui/blur-blob-bg'
 
 interface HeaderProps {
   title: string
@@ -26,15 +27,16 @@ export function Header({ title, description, children }: HeaderProps) {
   }, [])
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-6">
-      <div>
+    <header className="relative flex h-16 items-center justify-between border-b border-orange-500/20 backdrop-blur-md bg-card/80 px-6 overflow-hidden">
+      <BlurBlobBg variant="subtle" />
+      <div className="relative z-10">
         <h1 className="text-xl font-semibold">{title}</h1>
         {description && (
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="relative z-10 flex items-center gap-4">
         {children}
 
         {mounted && (
