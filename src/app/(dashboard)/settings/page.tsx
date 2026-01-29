@@ -3,6 +3,7 @@ import { UserProfile } from '@/components/settings/user-profile'
 import { VercelTokenForm } from '@/components/settings/vercel-token-form'
 import { CloudflareTokenForm } from '@/components/settings/cloudflare-token-form'
 import { GitHubImportForm } from '@/components/settings/github-import-form'
+import { Changelog } from '@/components/settings/changelog'
 import { getUserSettings } from '@/lib/actions/settings'
 import { getCurrentUser } from '@/lib/actions/user'
 
@@ -31,6 +32,8 @@ export default async function SettingsPage() {
           currentAccountId={settings?.cloudflare_account_id}
         />
         <GitHubImportForm />
+
+        <Changelog />
       </div>
     </div>
   )
