@@ -157,11 +157,12 @@
 /* Adapted from Uiverse.io by SelfMadeSystem */
 
 .blob-bg-container {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: #1a1a1a;
   overflow: hidden;
   z-index: 0;
+  pointer-events: none;
 }
 
 /* Dotted grid overlay with backdrop-filter glow */
