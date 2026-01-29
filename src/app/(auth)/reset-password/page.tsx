@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md backdrop-blur-xl bg-card/95 border-orange-500/20 shadow-2xl">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">Reset password</CardTitle>
         <CardDescription>
