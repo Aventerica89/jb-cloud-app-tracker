@@ -14,6 +14,8 @@ import {
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { UserAvatar } from '@/components/user/user-avatar'
+import { useCurrentUser } from '@/hooks/use-current-user'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -33,6 +35,7 @@ interface SidebarProps {
 
 export function Sidebar({ onSignOut }: SidebarProps) {
   const pathname = usePathname()
+  const { user } = useCurrentUser()
 
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
@@ -64,8 +67,33 @@ export function Sidebar({ onSignOut }: SidebarProps) {
         })}
       </nav>
 
-      {/* Secondary navigation */}
+      {/* User section and secondary navigation */}
       <div className="px-3 py-4 border-t">
+        {/* User info */}
+        {user && (
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 mb-2 hover:bg-accent transition-colors"
+          >
+            <UserAvatar
+              name={user.name}
+              email={user.email}
+              avatarUrl={user.avatarUrl}
+              size="sm"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                {user.name || 'User'}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </p>
+            </div>
+          </Link>
+        )}
+
+        <Separator className="my-2" />
+
         {secondaryNavigation.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -84,8 +112,6 @@ export function Sidebar({ onSignOut }: SidebarProps) {
             </Link>
           )
         })}
-
-        <Separator className="my-2" />
 
         <Button
           variant="ghost"
