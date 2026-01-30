@@ -18,6 +18,40 @@ export async function getTags(): Promise<Tag[]> {
   return data || []
 }
 
+export type TagWithCount = Tag & {
+  app_count: number
+}
+
+export async function getTagsWithCounts(): Promise<TagWithCount[]> {
+  const supabase = await createClient()
+
+  // Get tags with application counts via the junction table
+  const { data: tags, error: tagsError } = await supabase
+    .from('tags')
+    .select('*')
+    .order('name')
+
+  if (tagsError) throw tagsError
+
+  // Get application counts per tag
+  const { data: appTags, error: appTagsError } = await supabase
+    .from('application_tags')
+    .select('tag_id')
+
+  if (appTagsError) throw appTagsError
+
+  // Calculate counts for each tag
+  const tagCounts = new Map<string, number>()
+  for (const appTag of appTags || []) {
+    tagCounts.set(appTag.tag_id, (tagCounts.get(appTag.tag_id) || 0) + 1)
+  }
+
+  return (tags || []).map(tag => ({
+    ...tag,
+    app_count: tagCounts.get(tag.id) || 0,
+  }))
+}
+
 export async function getTag(id: string): Promise<Tag | null> {
   const supabase = await createClient()
 

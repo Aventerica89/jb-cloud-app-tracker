@@ -1,22 +1,15 @@
+import Link from 'next/link'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Cloud, ExternalLink } from 'lucide-react'
-import { getProviders } from '@/lib/actions/providers'
+import { Plus, Cloud, ExternalLink, Rocket, AppWindow } from 'lucide-react'
+import { getProvidersWithCounts } from '@/lib/actions/providers'
 import { AddProviderDialog } from '@/components/providers/add-provider-dialog'
 import { ProviderActions } from '@/components/providers/provider-actions'
 
 export default async function ProvidersPage() {
-  const providers = await getProviders()
+  const providers = await getProvidersWithCounts()
 
   return (
     <div className="flex flex-col h-full">
@@ -53,58 +46,74 @@ export default async function ProvidersPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {providers.map((provider) => (
-                  <TableRow key={provider.id}>
-                    <TableCell className="font-medium">
-                      {provider.name}
-                    </TableCell>
-                    <TableCell>
-                      <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                        {provider.slug}
-                      </code>
-                    </TableCell>
-                    <TableCell>
-                      {provider.base_url ? (
-                        <a
-                          href={provider.base_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-                        >
-                          {new URL(provider.base_url).hostname}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={provider.is_active ? 'default' : 'secondary'}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {providers.map((provider) => (
+              <Card key={provider.id} className="relative group hover:border-primary/50 transition-colors">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 dark:bg-orange-500/10">
+                        <Cloud className="h-5 w-5 text-primary dark:text-orange-400" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base">{provider.name}</CardTitle>
+                        <code className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          {provider.slug}
+                        </code>
+                      </div>
+                    </div>
+                    <ProviderActions provider={provider} />
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Stats row */}
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <AppWindow className="h-4 w-4" />
+                      <span>{provider.app_count} {provider.app_count === 1 ? 'app' : 'apps'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Rocket className="h-4 w-4" />
+                      <span>{provider.deployment_count} {provider.deployment_count === 1 ? 'deployment' : 'deployments'}</span>
+                    </div>
+                  </div>
+
+                  {/* URL and Status */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    {provider.base_url ? (
+                      <a
+                        href={provider.base_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {provider.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <ProviderActions provider={provider} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
+                        {new URL(provider.base_url).hostname}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No URL</span>
+                    )}
+                    <Badge
+                      variant={provider.is_active ? 'default' : 'secondary'}
+                      className={provider.is_active ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20' : ''}
+                    >
+                      {provider.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+
+                  {/* Link to deployments */}
+                  {provider.deployment_count > 0 && (
+                    <Link
+                      href={`/deployments?provider=${provider.id}`}
+                      className="block text-xs text-primary dark:text-orange-400 hover:underline"
+                    >
+                      View deployments →
+                    </Link>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </div>

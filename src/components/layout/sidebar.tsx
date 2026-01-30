@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { UserAvatar } from '@/components/user/user-avatar'
 import { useCurrentUser } from '@/hooks/use-current-user'
+import { DarkModeTexture } from '@/components/ui/dark-mode-texture'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -38,15 +39,17 @@ export function Sidebar({ onSignOut }: SidebarProps) {
   const { user } = useCurrentUser()
 
   return (
-    <div className="flex h-full w-64 flex-col bg-card border-r">
+    <div className="relative flex h-full w-64 flex-col bg-card dark:bg-card/95 border-r border-border dark:border-orange-500/20 overflow-hidden">
+      {/* Dark mode texture for sidebar */}
+      <DarkModeTexture variant="sidebar" />
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 px-6 border-b">
-        <Cloud className="h-6 w-6 text-primary" />
+      <div className="relative z-10 flex h-16 items-center gap-2 px-6 border-b border-border dark:border-orange-500/20 bg-card dark:bg-card/90 backdrop-blur-sm">
+        <Cloud className="h-6 w-6 text-primary dark:text-orange-400" />
         <span className="font-semibold text-lg">Cloud Tracker</span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="relative z-10 flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
@@ -68,7 +71,7 @@ export function Sidebar({ onSignOut }: SidebarProps) {
       </nav>
 
       {/* User section and secondary navigation */}
-      <div className="px-3 py-4 border-t">
+      <div className="relative z-10 px-3 py-4 border-t border-border dark:border-orange-500/20 bg-card dark:bg-card/90 backdrop-blur-sm">
         {/* User info */}
         {user && (
           <Link

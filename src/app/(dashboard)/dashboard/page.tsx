@@ -93,15 +93,17 @@ export default async function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {statCards.map((stat) => (
             <Link key={stat.name} href={stat.href}>
-              <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+              <Card className="hover:border-primary/50 dark:hover:border-orange-500/50 transition-all cursor-pointer group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     {stat.name}
                   </CardTitle>
-                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 dark:bg-orange-500/10 group-hover:bg-primary/20 dark:group-hover:bg-orange-500/20 transition-colors">
+                    <stat.icon className="h-4 w-4 text-primary dark:text-orange-400" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <div className="text-3xl font-bold">{stat.value}</div>
                 </CardContent>
               </Card>
             </Link>
@@ -171,7 +173,7 @@ export default async function DashboardPage() {
                   {recentDeployments.map((deployment) => (
                     <div
                       key={deployment.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 dark:bg-muted/30 hover:bg-muted/70 dark:hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex-1 min-w-0">
                         <Link
@@ -211,7 +213,7 @@ export default async function DashboardPage() {
                             href={deployment.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80"
+                            className="text-primary dark:text-orange-400 hover:text-primary/80 dark:hover:text-orange-300"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </a>
@@ -257,7 +259,7 @@ export default async function DashboardPage() {
                     <Link
                       key={app.id}
                       href={`/applications/${app.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 dark:bg-muted/30 hover:bg-muted/70 dark:hover:bg-muted/50 transition-colors"
                     >
                       <span className="font-medium truncate">{app.name}</span>
                       <Badge
@@ -280,27 +282,27 @@ export default async function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               <Link href="/applications/new">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="dark:border-orange-500/20 dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10">
                   <AppWindow className="mr-2 h-4 w-4" />
                   New Application
                 </Button>
               </Link>
               <Link href="/deployments/new">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="dark:border-orange-500/20 dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10">
                   <Rocket className="mr-2 h-4 w-4" />
                   New Deployment
                 </Button>
               </Link>
               <Link href="/providers">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="dark:border-orange-500/20 dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10">
                   <Cloud className="mr-2 h-4 w-4" />
                   Manage Providers
                 </Button>
               </Link>
               <Link href="/tags">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="dark:border-orange-500/20 dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10">
                   <Tags className="mr-2 h-4 w-4" />
                   Manage Tags
                 </Button>
