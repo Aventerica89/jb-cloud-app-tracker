@@ -48,7 +48,7 @@ export default async function ProvidersPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {providers.map((provider) => (
-              <Card key={provider.id} className="relative group hover:border-primary/50 transition-colors">
+              <Card key={provider.id} className="relative group hover:border-primary/50 dark:hover:border-orange-500/50 transition-colors">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">

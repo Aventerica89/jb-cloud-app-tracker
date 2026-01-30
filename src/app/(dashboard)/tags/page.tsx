@@ -44,7 +44,7 @@ export default async function TagsPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {tags.map((tag) => (
-              <Card key={tag.id} className="relative group hover:border-primary/50 transition-colors">
+              <Card key={tag.id} className="relative group hover:border-primary/50 dark:hover:border-orange-500/50 transition-colors">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
