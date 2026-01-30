@@ -49,10 +49,10 @@ export default async function TagsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-card"
+                        className="w-5 h-5 rounded-full"
                         style={{
                           backgroundColor: tag.color,
-                          ringColor: `${tag.color}40`
+                          boxShadow: `0 0 0 2px var(--card), 0 0 0 4px ${tag.color}40`
                         }}
                       />
                       <span className="font-semibold">{tag.name}</span>
