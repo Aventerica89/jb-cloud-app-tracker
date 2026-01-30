@@ -26,38 +26,32 @@ export type ProviderWithCounts = CloudProvider & {
 export async function getProvidersWithCounts(): Promise<ProviderWithCounts[]> {
   const supabase = await createClient()
 
-  // Get providers with deployment counts
+  // Use database-level relation fetching for better performance
+  // Single query fetches providers with their deployments
   const { data: providers, error: providersError } = await supabase
     .from('cloud_providers')
-    .select('*')
+    .select(`
+      *,
+      deployments(application_id)
+    `)
     .order('name')
 
   if (providersError) throw providersError
 
-  // Get deployment counts per provider
-  const { data: deploymentCounts, error: deploymentError } = await supabase
-    .from('deployments')
-    .select('provider_id, application_id')
+  // Transform the response to include counts
+  return (providers || []).map(provider => {
+    const deployments = (provider.deployments || []) as { application_id: string }[]
+    const uniqueApps = new Set(deployments.map(d => d.application_id))
 
-  if (deploymentError) throw deploymentError
-
-  // Calculate counts for each provider
-  const providerStats = new Map<string, { deployments: number; apps: Set<string> }>()
-
-  for (const deployment of deploymentCounts || []) {
-    if (!providerStats.has(deployment.provider_id)) {
-      providerStats.set(deployment.provider_id, { deployments: 0, apps: new Set() })
+    // Remove the deployments field and add counts
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { deployments: _deps, ...providerData } = provider
+    return {
+      ...providerData,
+      deployment_count: deployments.length,
+      app_count: uniqueApps.size,
     }
-    const stats = providerStats.get(deployment.provider_id)!
-    stats.deployments++
-    stats.apps.add(deployment.application_id)
-  }
-
-  return (providers || []).map(provider => ({
-    ...provider,
-    deployment_count: providerStats.get(provider.id)?.deployments || 0,
-    app_count: providerStats.get(provider.id)?.apps.size || 0,
-  }))
+  })
 }
 
 export async function getProvider(id: string): Promise<CloudProvider | null> {

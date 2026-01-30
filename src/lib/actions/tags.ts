@@ -25,31 +25,30 @@ export type TagWithCount = Tag & {
 export async function getTagsWithCounts(): Promise<TagWithCount[]> {
   const supabase = await createClient()
 
-  // Get tags with application counts via the junction table
+  // Use database-level relation fetching for better performance
+  // Single query fetches tags with their application associations
   const { data: tags, error: tagsError } = await supabase
     .from('tags')
-    .select('*')
+    .select(`
+      *,
+      application_tags(application_id)
+    `)
     .order('name')
 
   if (tagsError) throw tagsError
 
-  // Get application counts per tag
-  const { data: appTags, error: appTagsError } = await supabase
-    .from('application_tags')
-    .select('tag_id')
+  // Transform the response to include counts
+  return (tags || []).map(tag => {
+    const appTags = (tag.application_tags || []) as { application_id: string }[]
 
-  if (appTagsError) throw appTagsError
-
-  // Calculate counts for each tag
-  const tagCounts = new Map<string, number>()
-  for (const appTag of appTags || []) {
-    tagCounts.set(appTag.tag_id, (tagCounts.get(appTag.tag_id) || 0) + 1)
-  }
-
-  return (tags || []).map(tag => ({
-    ...tag,
-    app_count: tagCounts.get(tag.id) || 0,
-  }))
+    // Remove the application_tags field and add count
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { application_tags: _appTags, ...tagData } = tag
+    return {
+      ...tagData,
+      app_count: appTags.length,
+    }
+  })
 }
 
 export async function getTag(id: string): Promise<Tag | null> {
