@@ -18,6 +18,48 @@ export async function getProviders(): Promise<CloudProvider[]> {
   return data || []
 }
 
+export type ProviderWithCounts = CloudProvider & {
+  deployment_count: number
+  app_count: number
+}
+
+export async function getProvidersWithCounts(): Promise<ProviderWithCounts[]> {
+  const supabase = await createClient()
+
+  // Get providers with deployment counts
+  const { data: providers, error: providersError } = await supabase
+    .from('cloud_providers')
+    .select('*')
+    .order('name')
+
+  if (providersError) throw providersError
+
+  // Get deployment counts per provider
+  const { data: deploymentCounts, error: deploymentError } = await supabase
+    .from('deployments')
+    .select('provider_id, application_id')
+
+  if (deploymentError) throw deploymentError
+
+  // Calculate counts for each provider
+  const providerStats = new Map<string, { deployments: number; apps: Set<string> }>()
+
+  for (const deployment of deploymentCounts || []) {
+    if (!providerStats.has(deployment.provider_id)) {
+      providerStats.set(deployment.provider_id, { deployments: 0, apps: new Set() })
+    }
+    const stats = providerStats.get(deployment.provider_id)!
+    stats.deployments++
+    stats.apps.add(deployment.application_id)
+  }
+
+  return (providers || []).map(provider => ({
+    ...provider,
+    deployment_count: providerStats.get(provider.id)?.deployments || 0,
+    app_count: providerStats.get(provider.id)?.apps.size || 0,
+  }))
+}
+
 export async function getProvider(id: string): Promise<CloudProvider | null> {
   const supabase = await createClient()
 

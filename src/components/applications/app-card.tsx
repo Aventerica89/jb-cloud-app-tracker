@@ -26,7 +26,7 @@ export function AppCard({ app }: AppCardProps) {
 
   return (
     <Card
-      className="hover:border-primary/50 transition-colors cursor-pointer h-full"
+      className="hover:border-primary/50 dark:hover:border-orange-500/50 transition-all cursor-pointer h-full group"
       onClick={handleCardClick}
     >
       <CardHeader className="pb-2">
@@ -83,13 +83,13 @@ export function AppCard({ app }: AppCardProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-3 text-xs text-muted-foreground pt-2">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground pt-2 border-t border-border/50">
           {app.live_url && (
             <a
               href={app.live_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-primary hover:underline"
+              className="flex items-center gap-1 text-primary dark:text-orange-400 hover:underline"
               onClick={(e) => e.stopPropagation()}
             >
               <Globe className="h-3 w-3" />
@@ -101,7 +101,7 @@ export function AppCard({ app }: AppCardProps) {
               href={app.repository_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-foreground"
+              className="flex items-center gap-1 hover:text-foreground dark:hover:text-orange-300"
               onClick={(e) => e.stopPropagation()}
             >
               <GitBranch className="h-3 w-3" />
@@ -109,7 +109,7 @@ export function AppCard({ app }: AppCardProps) {
             </a>
           )}
           {app.deployments && app.deployments.length > 0 && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 ml-auto text-primary/70 dark:text-orange-400/70">
               <ExternalLink className="h-3 w-3" />
               {app.deployments.length} deployment{app.deployments.length !== 1 ? 's' : ''}
             </span>

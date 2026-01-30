@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { Moon, Sun, Cloud } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -14,6 +14,12 @@ import {
 import { MobileNav } from '@/components/layout/mobile-nav'
 import { UserAvatar } from '@/components/user/user-avatar'
 import { useCurrentUser } from '@/hooks/use-current-user'
+import { DarkModeTexture } from '@/components/ui/dark-mode-texture'
+
+// Hydration-safe mounted detection
+const emptySubscribe = () => () => {}
+const getSnapshot = () => true
+const getServerSnapshot = () => false
 
 interface MobileHeaderProps {
   onSignOut?: () => void
@@ -21,24 +27,23 @@ interface MobileHeaderProps {
 
 export function MobileHeader({ onSignOut }: MobileHeaderProps) {
   const { setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const mounted = useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot)
   const { user } = useCurrentUser()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:hidden">
-      <div className="flex items-center gap-2">
+    <header className="relative flex h-14 items-center justify-between border-b border-border dark:border-orange-500/20 bg-card dark:bg-card/95 px-4 md:hidden overflow-hidden">
+      {/* Dark mode texture */}
+      <DarkModeTexture variant="sidebar" />
+
+      <div className="relative z-10 flex items-center gap-2">
         <MobileNav onSignOut={onSignOut} />
         <div className="flex items-center gap-2">
-          <Cloud className="h-5 w-5 text-primary" />
+          <Cloud className="h-5 w-5 text-primary dark:text-orange-400" />
           <span className="font-semibold">Cloud Tracker</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="relative z-10 flex items-center gap-2">
         {mounted && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

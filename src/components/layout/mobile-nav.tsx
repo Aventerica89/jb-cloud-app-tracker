@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/sheet'
 import { UserAvatar } from '@/components/user/user-avatar'
 import { useCurrentUser } from '@/hooks/use-current-user'
+import { DarkModeTexture } from '@/components/ui/dark-mode-texture'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -59,15 +60,18 @@ export function MobileNav({ onSignOut }: MobileNavProps) {
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0">
-        <SheetHeader className="border-b px-6 py-4">
+      <SheetContent side="left" className="w-64 p-0 overflow-hidden">
+        {/* Dark mode texture */}
+        <DarkModeTexture variant="sidebar" />
+
+        <SheetHeader className="relative z-10 border-b border-border dark:border-orange-500/20 px-6 py-4 bg-card dark:bg-card/90">
           <SheetTitle className="flex items-center gap-2">
-            <Cloud className="h-5 w-5 text-primary" />
+            <Cloud className="h-5 w-5 text-primary dark:text-orange-400" />
             Cloud Tracker
           </SheetTitle>
         </SheetHeader>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="relative z-10 flex-1 space-y-1 px-3 py-4">
           {navigation.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
             return (
@@ -89,7 +93,7 @@ export function MobileNav({ onSignOut }: MobileNavProps) {
           })}
         </nav>
 
-        <div className="px-3 py-4 border-t">
+        <div className="relative z-10 px-3 py-4 border-t border-border dark:border-orange-500/20 bg-card dark:bg-card/90">
           {/* User info */}
           {user && (
             <Link

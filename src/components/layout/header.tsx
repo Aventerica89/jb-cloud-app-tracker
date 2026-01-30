@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { BlurBlobBg } from '@/components/ui/blur-blob-bg'
+import { DarkModeTexture } from '@/components/ui/dark-mode-texture'
+
+// Hydration-safe mounted detection
+const emptySubscribe = () => () => {}
+const getSnapshot = () => true
+const getServerSnapshot = () => false
 
 interface HeaderProps {
   title: string
@@ -20,15 +25,11 @@ interface HeaderProps {
 
 export function Header({ title, description, children }: HeaderProps) {
   const { setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot)
 
   return (
-    <header className="relative flex h-16 items-center justify-between border-b border-orange-500/20 backdrop-blur-md bg-card/80 px-6 overflow-hidden">
-      <BlurBlobBg variant="subtle" />
+    <header className="relative flex h-16 items-center justify-between border-b border-border dark:border-orange-500/20 backdrop-blur-md bg-card dark:bg-card/90 px-6 overflow-hidden">
+      <DarkModeTexture variant="sidebar" />
       <div className="relative z-10">
         <h1 className="text-xl font-semibold">{title}</h1>
         {description && (

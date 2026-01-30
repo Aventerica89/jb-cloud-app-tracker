@@ -140,7 +140,7 @@ export function CloudflareTokenForm({ hasToken, currentAccountId }: CloudflareTo
               >
                 dash.cloudflare.com/profile/api-tokens
               </a>
-              {' '}with "Cloudflare Pages:Read" permission.
+              {' '}with &quot;Cloudflare Pages:Read&quot; permission.
             </p>
           </div>
 

@@ -1,13 +1,15 @@
+import Link from 'next/link'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Plus, Tags } from 'lucide-react'
-import { getTags } from '@/lib/actions/tags'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Tags, AppWindow } from 'lucide-react'
+import { getTagsWithCounts } from '@/lib/actions/tags'
 import { AddTagDialog } from '@/components/tags/add-tag-dialog'
 import { TagActions } from '@/components/tags/tag-actions'
 
 export default async function TagsPage() {
-  const tags = await getTags()
+  const tags = await getTagsWithCounts()
 
   return (
     <div className="flex flex-col h-full">
@@ -42,16 +44,49 @@ export default async function TagsPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {tags.map((tag) => (
-              <Card key={tag.id} className="relative">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span className="font-medium">{tag.name}</span>
+              <Card key={tag.id} className="relative group hover:border-primary/50 transition-colors">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-card"
+                        style={{
+                          backgroundColor: tag.color,
+                          ringColor: `${tag.color}40`
+                        }}
+                      />
+                      <span className="font-semibold">{tag.name}</span>
+                    </div>
+                    <TagActions tag={tag} />
                   </div>
-                  <TagActions tag={tag} />
+
+                  {/* Application count */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <AppWindow className="h-4 w-4" />
+                      <span>{tag.app_count} {tag.app_count === 1 ? 'app' : 'apps'}</span>
+                    </div>
+                    <Badge
+                      className="text-xs"
+                      style={{
+                        backgroundColor: `${tag.color}15`,
+                        borderColor: `${tag.color}40`,
+                        color: tag.color,
+                      }}
+                    >
+                      {tag.color}
+                    </Badge>
+                  </div>
+
+                  {/* Link to applications */}
+                  {tag.app_count > 0 && (
+                    <Link
+                      href={`/applications?tag=${tag.id}`}
+                      className="block text-xs text-primary dark:text-orange-400 hover:underline"
+                    >
+                      View applications →
+                    </Link>
+                  )}
                 </CardContent>
               </Card>
             ))}
