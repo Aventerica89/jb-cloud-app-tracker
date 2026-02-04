@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src="public/icons/icon.svg" alt="Cloud App Tracker" width="128" height="128">
+</p>
 
-## Getting Started
+<h1 align="center">Cloud App Tracker</h1>
 
-First, run the development server:
+<p align="center">
+  <strong>Track and manage cloud applications across multiple providers</strong>
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15-black" alt="Next.js 15">
+  <img src="https://img.shields.io/badge/TypeScript-5-blue" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Supabase-PostgreSQL-green" alt="Supabase">
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#demo">Demo</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#integrations">Integrations</a>
+</p>
+
+---
+
+## The Problem
+
+When you deploy apps across Vercel, Cloudflare, Railway, and other providers, it's hard to track:
+- What's deployed where?
+- What's the current status?
+- When was it last updated?
+
+Cloud App Tracker gives you a single dashboard to see everything.
+
+## Features
+
+- **Unified Dashboard** - See all your apps in one place
+- **Provider Integration** - Auto-sync from Vercel and Cloudflare
+- **Deployment Tracking** - History of all deployments with status
+- **Tags & Organization** - Categorize apps your way
+- **Dark Mode** - Easy on the eyes
+- **Auto-Sync** - Updates when you view an app
+
+## Demo
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Cloud App Tracker                          🌙  Settings    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Dashboard                                                  │
+│  ├── 12 Applications                                        │
+│  ├── 47 Deployments                                         │
+│  └── 4 Providers                                            │
+│                                                             │
+│  Recent Deployments                                         │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ claude-codex    Vercel     deployed    2 min ago    │   │
+│  │ URLsToGo        Cloudflare deployed    1 hour ago   │   │
+│  │ jb-cloud-docs   Vercel     deployed    12 hours ago │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+
+- Supabase account
+- Vercel/Cloudflare accounts (for integrations)
 
-## Learn More
+### Setup
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Clone the repo
+git clone https://github.com/Aventerica89/jb-cloud-app-tracker.git
+cd jb-cloud-app-tracker
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Install dependencies
+npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
 
-## Deploy on Vercel
+# Run development server
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+## Integrations
+
+### Vercel
+
+1. Go to **Settings** > Add Vercel API Token
+2. Edit an app > Select Vercel Project
+3. Click **Sync Vercel** to import deployments
+
+### Cloudflare Pages
+
+1. Go to **Settings** > Add Cloudflare Token + Account ID
+2. Edit an app > Select Cloudflare Project
+3. Click **Sync Cloudflare** to import deployments
+
+### Status Mapping
+
+| Provider Status | Local Status |
+|----------------|--------------|
+| READY / success | deployed |
+| ERROR / failure | failed |
+| BUILDING / active | building |
+| QUEUED | pending |
+| CANCELED | rolled_back |
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 15 (App Router) |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Hosting | Vercel |
+| UI | Tailwind CSS + shadcn/ui |
+| Testing | Vitest + Playwright |
+
+## Development
+
+```bash
+# Run dev server
+npm run dev
+
+# Run tests
+npm test
+
+# Run E2E tests
+npm run test:e2e
+
+# Type check
+npm run typecheck
+
+# Build for production
+npm run build
+```
+
+## License
+
+MIT
