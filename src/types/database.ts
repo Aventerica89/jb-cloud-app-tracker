@@ -2,6 +2,7 @@
 export type AppStatus = 'active' | 'inactive' | 'archived' | 'maintenance'
 export type DeploymentStatus = 'pending' | 'building' | 'deployed' | 'failed' | 'rolled_back'
 export type MaintenanceStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
+export type SessionSource = 'claude-code' | 'claude-ai' | 'mixed'
 
 // User Settings
 export interface UserSettings {
@@ -113,6 +114,35 @@ export interface MaintenanceRunWithRelations extends MaintenanceRun {
   command_type: MaintenanceCommandType
 }
 
+// Claude Sessions
+export interface ClaudeSession {
+  id: string
+  application_id: string
+  started_at: string
+  ended_at: string | null
+  duration_minutes: number | null
+  starting_branch: string | null
+  ending_branch: string | null
+  commits_count: number
+  context_id: string | null
+  session_source: SessionSource
+  tokens_input: number | null
+  tokens_output: number | null
+  tokens_total: number | null
+  summary: string | null
+  accomplishments: string[]
+  next_steps: string[]
+  files_changed: string[]
+  maintenance_runs: string[]
+  security_findings: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ClaudeSessionWithRelations extends ClaudeSession {
+  application: Application
+}
+
 export interface MaintenanceStatusItem {
   command_type: MaintenanceCommandType
   last_run_at: string | null
@@ -169,6 +199,46 @@ export interface CreateProviderInput {
 export interface CreateTagInput {
   name: string
   color?: string
+}
+
+// Session input types
+export interface CreateSessionInput {
+  application_id: string
+  started_at?: string
+  ended_at?: string
+  duration_minutes?: number
+  starting_branch?: string
+  ending_branch?: string
+  commits_count?: number
+  context_id?: string
+  session_source?: SessionSource
+  tokens_input?: number
+  tokens_output?: number
+  tokens_total?: number
+  summary?: string
+  accomplishments?: string[]
+  next_steps?: string[]
+  files_changed?: string[]
+  maintenance_runs?: string[]
+  security_findings?: Record<string, unknown>
+}
+
+export interface UpdateSessionInput {
+  id: string
+  ended_at?: string
+  duration_minutes?: number
+  ending_branch?: string
+  commits_count?: number
+  session_source?: SessionSource
+  tokens_input?: number
+  tokens_output?: number
+  tokens_total?: number
+  summary?: string
+  accomplishments?: string[]
+  next_steps?: string[]
+  files_changed?: string[]
+  maintenance_runs?: string[]
+  security_findings?: Record<string, unknown>
 }
 
 // Vercel API types

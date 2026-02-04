@@ -10,6 +10,7 @@ import {
   ExternalLink,
   GitBranch,
   Rocket,
+  Terminal,
 } from 'lucide-react'
 import { getApplication } from '@/lib/actions/applications'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
@@ -23,6 +24,7 @@ import {
   getMaintenanceRuns,
   getMaintenanceCommandTypes,
 } from '@/lib/actions/maintenance'
+import { getSessionStats } from '@/lib/actions/sessions'
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-500 border-green-500/20',
@@ -43,11 +45,12 @@ export default async function ApplicationDetailPage({ params }: Props) {
     notFound()
   }
 
-  // Fetch maintenance data in parallel
-  const [maintenanceStatus, maintenanceRuns, commandTypes] = await Promise.all([
+  // Fetch maintenance and session data in parallel
+  const [maintenanceStatus, maintenanceRuns, commandTypes, sessionStats] = await Promise.all([
     getLatestMaintenanceStatus(id),
     getMaintenanceRuns(id),
     getMaintenanceCommandTypes(),
+    getSessionStats(id),
   ])
 
   return (
@@ -207,6 +210,58 @@ export default async function ApplicationDetailPage({ params }: Props) {
         />
 
         <MaintenanceHistory runs={maintenanceRuns} />
+
+        {/* Sessions */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Claude Sessions</h2>
+          <Link href={`/applications/${app.id}/sessions`}>
+            <Button variant="outline" size="sm">
+              <Terminal className="mr-2 h-4 w-4" />
+              View All Sessions
+            </Button>
+          </Link>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Session Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {sessionStats.total_sessions > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-2xl font-bold">{sessionStats.total_sessions}</p>
+                  <p className="text-sm text-muted-foreground">Sessions</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {sessionStats.total_duration_minutes < 60
+                      ? `${sessionStats.total_duration_minutes}m`
+                      : `${Math.round(sessionStats.total_duration_minutes / 60)}h`}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Total Time</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{sessionStats.total_commits}</p>
+                  <p className="text-sm text-muted-foreground">Commits</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {sessionStats.total_tokens >= 1000
+                      ? `${(sessionStats.total_tokens / 1000).toFixed(0)}K`
+                      : sessionStats.total_tokens}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Tokens</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No Claude Code sessions recorded yet. Sessions are automatically
+                created when you run <code>/end</code> in Claude Code.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
