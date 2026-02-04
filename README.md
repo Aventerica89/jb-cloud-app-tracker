@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/icons/icon.svg" alt="Cloud App Tracker" width="128" height="128">
+  <img src="public/assets/logo.svg" alt="Cloud App Tracker" width="128" height="128">
 </p>
 
 <h1 align="center">Cloud App Tracker</h1>
@@ -9,9 +9,16 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-15-black" alt="Next.js 15">
-  <img src="https://img.shields.io/badge/TypeScript-5-blue" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Supabase-PostgreSQL-green" alt="Supabase">
+  <a href="https://github.com/Aventerica89/jb-cloud-app-tracker/stargazers"><img src="https://img.shields.io/github/stars/Aventerica89/jb-cloud-app-tracker?style=flat&color=3b82f6" alt="Stars"></a>
+  <a href="https://github.com/Aventerica89/jb-cloud-app-tracker/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
+  <img src="https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white" alt="Next.js 15">
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white" alt="Supabase">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Vercel-Integration-000000?logo=vercel&logoColor=white" alt="Vercel">
+  <img src="https://img.shields.io/badge/Cloudflare-Integration-F38020?logo=cloudflare&logoColor=white" alt="Cloudflare">
 </p>
 
 <p align="center">
@@ -34,12 +41,14 @@ Cloud App Tracker gives you a single dashboard to see everything.
 
 ## Features
 
-- **Unified Dashboard** - See all your apps in one place
-- **Provider Integration** - Auto-sync from Vercel and Cloudflare
-- **Deployment Tracking** - History of all deployments with status
-- **Tags & Organization** - Categorize apps your way
-- **Dark Mode** - Easy on the eyes
-- **Auto-Sync** - Updates when you view an app
+| Feature | Description |
+|---------|-------------|
+| **Unified Dashboard** | See all your apps in one place |
+| **Provider Integration** | Auto-sync from Vercel and Cloudflare |
+| **Deployment Tracking** | History of all deployments with status |
+| **Tags & Organization** | Categorize apps your way |
+| **Dark Mode** | Easy on the eyes |
+| **Auto-Sync** | Updates when you view an app |
 
 ## Demo
 
@@ -115,11 +124,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 | Provider Status | Local Status |
 |----------------|--------------|
-| READY / success | deployed |
-| ERROR / failure | failed |
-| BUILDING / active | building |
-| QUEUED | pending |
-| CANCELED | rolled_back |
+| ![ready](https://img.shields.io/badge/READY-success-22c55e) | deployed |
+| ![error](https://img.shields.io/badge/ERROR-failure-ef4444) | failed |
+| ![building](https://img.shields.io/badge/BUILDING-active-3b82f6) | building |
+| ![queued](https://img.shields.io/badge/QUEUED--f59e0b) | pending |
+| ![canceled](https://img.shields.io/badge/CANCELED--64748b) | rolled_back |
 
 ## Tech Stack
 
@@ -150,6 +159,14 @@ npm run typecheck
 # Build for production
 npm run build
 ```
+
+## Roadmap
+
+- [ ] Railway integration
+- [ ] AWS Amplify integration
+- [ ] Netlify integration
+- [ ] Webhook notifications for deployment status
+- [ ] Mobile app (React Native)
 
 ## License
 
