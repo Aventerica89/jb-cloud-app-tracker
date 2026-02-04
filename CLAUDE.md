@@ -1,88 +1,46 @@
 # jb-cloud-app-tracker
 
-A personal web application to track and manage cloud applications across multiple providers.
+Next.js 15 app to track cloud applications across multiple providers (Vercel, Cloudflare, Railway, etc.).
 
-## Project Overview
+## Commands
 
-**Description**: Track and manage cloud applications, inventory cloud resources, and monitor app deployments across multiple providers (Vercel, Cloudflare, Railway, AWS, etc.)
+```bash
+npm install          # Install dependencies
+npm run dev          # Dev server at http://localhost:3000
+npm test             # Run Vitest unit tests
+npm run test:e2e     # Run Playwright E2E tests
+npm run typecheck    # TypeScript check
+npm run lint         # ESLint
+npm run build        # Production build
+```
 
-**Problem Solved**:
-- Hard to track what's deployed where across multiple providers
-- Need visibility into cloud apps with no central place to see all applications
-- Managing app lifecycle from development to production
-
-**Users**: Personal use
-
-**Docs Sync**: Yes (docs.jbcloud.app)
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 15 (App Router) |
-| Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth |
-| Hosting | Vercel |
-| UI | Tailwind CSS + v0 components |
-| Icons | Lucide React |
-| Validation | Zod |
-| Testing | Vitest + Playwright |
-
----
-
-## Key Architecture Decisions
-
-1. **Server Actions** for all mutations (type-safe, less boilerplate)
-2. **React Server Components** for data fetching (streaming, caching)
-3. **Row-Level Security** on all tables (data isolation)
-4. **User-owned providers** with seeded defaults on signup
-5. **Shared environments** table (dev, staging, production)
-
----
-
-## Project Structure
+## Architecture
 
 ```
 src/
 ├── app/
-│   ├── (auth)/           # Login, signup
-│   ├── (dashboard)/      # Protected routes
-│   │   ├── dashboard/    # Overview stats
-│   │   ├── applications/ # App management
-│   │   ├── deployments/  # Deployment tracking
-│   │   ├── providers/    # Provider config
-│   │   ├── settings/     # User settings (API tokens)
-│   │   └── tags/         # Tag management
+│   ├── (auth)/           # Login, signup (public)
+│   └── (dashboard)/      # Protected routes
+│       ├── dashboard/    # Overview stats
+│       ├── applications/ # App CRUD
+│       ├── deployments/  # Deployment tracking
+│       ├── providers/    # Provider config
+│       ├── settings/     # API tokens
+│       └── tags/         # Tag management
 ├── components/
-│   ├── ui/               # v0/shadcn components
+│   ├── ui/               # shadcn/ui components
 │   ├── forms/            # Form components
-│   └── [feature]/        # Feature components
+│   └── [feature]/        # Feature-specific
 ├── lib/
-│   ├── supabase/         # Supabase clients
-│   ├── actions/          # Server actions
+│   ├── supabase/         # Client + server clients
+│   ├── actions/          # Server Actions
 │   ├── schemas/          # Zod validation
 │   └── utils/            # Utilities
 ├── hooks/                # Custom React hooks
 └── types/                # TypeScript types
 ```
 
----
-
 ## Database Schema
-
-### Core Tables
-
-- **applications** - Cloud apps with name, description, status, tech_stack
-- **cloud_providers** - User-owned providers (Vercel, Cloudflare, etc.)
-- **deployments** - Links apps to providers and environments
-- **environments** - Shared table (dev, staging, production)
-- **tags** - User-owned labels for organizing apps
-- **application_tags** - Junction table for many-to-many
-- **user_settings** - API tokens for provider integrations
-
-### Key Relationships
 
 ```
 applications --< deployments >-- cloud_providers
@@ -90,178 +48,76 @@ applications >--< tags (via application_tags)
 deployments >-- environments
 ```
 
----
+### Core Tables
+- `applications` - name, description, status, tech_stack
+- `cloud_providers` - user-owned (Vercel, Cloudflare, etc.)
+- `deployments` - links apps to providers + environments
+- `environments` - shared (dev, staging, production)
+- `tags` - user-owned labels
+- `user_settings` - API tokens for integrations
 
-## Development Commands
+## Key Patterns
 
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Run tests
-npm test
-
-# Run E2E tests
-npm run test:e2e
-
-# Type check
-npm run typecheck
-
-# Lint
-npm run lint
-
-# Build for production
-npm run build
-```
-
----
-
-## Environment Variables
-
-Required in `.env.local`:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key  # Server-side only
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
----
-
-## Implementation Status
-
-See `docs/PLAN.md` for detailed implementation plan.
-
-### Phases
-
-- [x] Phase 1: Foundation (auth, layout)
-- [x] Phase 2: Core Data (providers, tags, applications)
-- [x] Phase 3: Deployments
-- [x] Phase 4: Dashboard
-- [x] Phase 5: Polish (search, dark mode)
-- [x] Phase 6: Launch (testing, deploy)
-- [x] Phase 7: Vercel Integration (API sync)
-- [x] Phase 8: Cloudflare Integration (API sync)
-- [x] Phase 9: Auto-sync deployments on page view
-
----
-
-## Documentation
-
-- `docs/ARCHITECTURE.md` - System architecture and design decisions
-- `docs/PLAN.md` - Implementation plan with tasks and dependencies
-
----
-
-## Style Guide
-
-| Element | Value |
-|---------|-------|
-| Primary Color | Blue (#3b82f6) |
-| Neutrals | Slate scale |
-| Font (Sans) | Inter |
-| Font (Mono) | JetBrains Mono |
-| Border Radius | 8px default |
-| Dark Mode | System preference + toggle |
-
----
-
-## Coding Standards
-
-- TypeScript strict mode
-- Zod validation for all inputs
-- Server Actions for mutations
-- Immutable patterns (never mutate)
-- Small files (200-400 lines typical)
-- 80%+ test coverage target
-
----
-
-## Deployment
-
-### Vercel Deployment
-
-1. Push to GitHub repository
-2. Import project in Vercel dashboard
-3. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_APP_URL` (your Vercel domain)
-4. Deploy
-
-### Supabase Configuration
-
-1. Update Supabase Auth settings with production URL:
-   - Site URL: `https://your-app.vercel.app`
-   - Redirect URLs: `https://your-app.vercel.app/callback`
-
----
+- **Server Actions** for all mutations (type-safe, in `lib/actions/`)
+- **React Server Components** for data fetching
+- **Row-Level Security** on all Supabase tables
+- **Zod schemas** for all form validation (`lib/schemas/`)
+- User-owned providers seeded on signup
 
 ## Provider Integrations
 
-### Vercel Integration
+### Vercel
+- Token stored in `user_settings`
+- Sync via `lib/actions/vercel.ts` + `lib/actions/sync.ts`
+- Status mapping: READY→deployed, ERROR→failed, BUILDING→building
 
-Sync deployments automatically from Vercel:
-
-1. Go to **Settings** and add your Vercel API token
-   - Get token from: https://vercel.com/account/tokens
-2. Edit an application and select a **Vercel Project** from dropdown
-3. Click **Sync Vercel** on app detail page to import deployments
-
-**Status Mapping:**
-| Vercel State | Local Status |
-|--------------|--------------|
-| READY | deployed |
-| ERROR | failed |
-| BUILDING | building |
-| QUEUED | pending |
-| CANCELED | rolled_back |
-
-**Files:**
-- `src/lib/actions/vercel.ts` - Vercel API client
-- `src/lib/actions/sync.ts` - Deployment sync logic
-- `src/lib/actions/settings.ts` - Token storage
-- `src/components/settings/vercel-token-form.tsx` - Token UI
-
-### Cloudflare Integration
-
-Sync deployments automatically from Cloudflare Pages:
-
-1. Go to **Settings** and add your Cloudflare API token and Account ID
-   - Get token from: https://dash.cloudflare.com/profile/api-tokens
-   - Token needs "Cloudflare Pages:Read" permission
-   - Find Account ID in your Cloudflare dashboard URL or Workers & Pages overview
-2. Edit an application and select a **Cloudflare Pages Project** from dropdown
-3. Click **Sync Cloudflare** on app detail page to import deployments
-
-**Status Mapping:**
-| Cloudflare Stage | Local Status |
-|------------------|--------------|
-| deploy + success | deployed |
-| failure | failed |
-| canceled | rolled_back |
-| active | building |
-| other | pending |
-
-**Files:**
-- `src/lib/actions/cloudflare.ts` - Cloudflare API client
-- `src/lib/actions/sync.ts` - Deployment sync logic (shared with Vercel)
-- `src/lib/actions/settings.ts` - Token storage
-- `src/components/settings/cloudflare-token-form.tsx` - Token UI
-- `src/components/applications/cloudflare-project-select.tsx` - Project selector
+### Cloudflare
+- Token + Account ID in `user_settings`
+- Sync via `lib/actions/cloudflare.ts`
+- Needs "Cloudflare Pages:Read" permission
 
 ### Auto-Sync
+- Triggers 500ms after app detail page load
+- Syncs Vercel + Cloudflare in parallel
+- Component: `components/applications/auto-sync.tsx`
 
-Deployments are automatically synced when viewing an application detail page:
+## Environment Variables
 
-- Triggers 500ms after page load (non-blocking)
-- Syncs both Vercel and Cloudflare in parallel if configured
-- Refreshes the page data after sync completes
-- Manual sync buttons still available for on-demand refresh
+```bash
+# Required
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-**Files:**
-- `src/components/applications/auto-sync.tsx` - Auto-sync client component
+# Server-side only
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+## Gotchas
+
+- RLS policies require `auth.uid()` - all queries must have authenticated user
+- Server Actions must use `createServerClient` not `createBrowserClient`
+- Vercel API returns `state`, Cloudflare returns `stage` - different field names
+- Provider tokens stored encrypted in `user_settings.settings` JSONB column
+- Auto-sync uses `router.refresh()` after completion - don't call setState after
+- Supabase Auth redirect URLs must be configured in dashboard for production
+
+## Testing
+
+```bash
+# Unit tests
+npm test
+
+# E2E tests (requires dev server running)
+npm run test:e2e
+
+# Type check before commit
+npm run typecheck
+```
+
+## Deployment
+
+1. Push to GitHub
+2. Import in Vercel dashboard
+3. Add env vars (SUPABASE_* + APP_URL)
+4. Update Supabase Auth redirect URLs to production domain
