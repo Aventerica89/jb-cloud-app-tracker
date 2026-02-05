@@ -24,6 +24,11 @@ export async function getApplications(
       *,
       application_tags (
         tag:tags (*)
+      ),
+      deployments (
+        *,
+        provider:cloud_providers (*),
+        environment:environments (*)
       )
     `
   )
@@ -47,11 +52,16 @@ export async function getApplications(
 
   if (error) throw error
 
-  // Transform nested tags structure
+  // Transform nested tags and deployments structure
   return (data || []).map((app) => ({
     ...app,
     tags: app.application_tags?.map((at: { tag: unknown }) => at.tag) || [],
-    deployments: [],
+    deployments:
+      app.deployments?.map((d: Record<string, unknown>) => ({
+        ...d,
+        provider: d.provider,
+        environment: d.environment,
+      })) || [],
   }))
 }
 
