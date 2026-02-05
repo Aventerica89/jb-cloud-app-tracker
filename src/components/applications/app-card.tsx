@@ -3,15 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { AppStatusBadge } from '@/components/ui/status-badge'
 import { ExternalLink, GitBranch, Globe } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { interactiveStates } from '@/lib/design-tokens'
 import type { ApplicationWithRelations } from '@/types/database'
-
-const statusColors = {
-  active: 'bg-green-500/10 text-green-500 border-green-500/20',
-  inactive: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
-  archived: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  maintenance: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-}
 
 interface AppCardProps {
   app: ApplicationWithRelations
@@ -24,17 +20,32 @@ export function AppCard({ app }: AppCardProps) {
     router.push(`/applications/${app.id}`)
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      router.push(`/applications/${app.id}`)
+    }
+  }
+
   return (
     <Card
-      className="hover:border-primary/50 dark:hover:border-orange-500/50 transition-all cursor-pointer h-full group"
+      className={cn(
+        'h-full group',
+        interactiveStates.card.base,
+        interactiveStates.card.hover,
+        interactiveStates.card.focus,
+        interactiveStates.card.active
+      )}
       onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="article"
+      aria-label={`Application: ${app.name}, Status: ${app.status}`}
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg line-clamp-1">{app.name}</CardTitle>
-          <Badge variant="outline" className={statusColors[app.status]}>
-            {app.status}
-          </Badge>
+          <AppStatusBadge status={app.status} size="sm" />
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -89,10 +100,16 @@ export function AppCard({ app }: AppCardProps) {
               href={app.live_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-primary dark:text-orange-400 hover:underline"
+              className={cn(
+                'flex items-center gap-1 text-primary dark:text-orange-400',
+                interactiveStates.link.base,
+                interactiveStates.link.hover,
+                interactiveStates.link.focus
+              )}
               onClick={(e) => e.stopPropagation()}
+              aria-label={`Visit live site: ${app.live_url}`}
             >
-              <Globe className="h-3 w-3" />
+              <Globe className="h-3 w-3" aria-hidden="true" />
               Live
             </a>
           )}
@@ -101,10 +118,16 @@ export function AppCard({ app }: AppCardProps) {
               href={app.repository_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-foreground dark:hover:text-orange-300"
+              className={cn(
+                'flex items-center gap-1',
+                interactiveStates.link.base,
+                interactiveStates.link.hover,
+                interactiveStates.link.focus
+              )}
               onClick={(e) => e.stopPropagation()}
+              aria-label={`View repository: ${app.repository_url}`}
             >
-              <GitBranch className="h-3 w-3" />
+              <GitBranch className="h-3 w-3" aria-hidden="true" />
               Repo
             </a>
           )}
@@ -119,16 +142,24 @@ export function AppCard({ app }: AppCardProps) {
                     href={deployment.url!}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-primary dark:text-orange-400 hover:underline ml-auto"
+                    className={cn(
+                      'flex items-center gap-1 text-primary dark:text-orange-400 ml-auto',
+                      interactiveStates.link.base,
+                      interactiveStates.link.hover,
+                      interactiveStates.link.focus
+                    )}
                     onClick={(e) => e.stopPropagation()}
-                    title={`${deployment.provider?.name} - ${deployment.environment?.name}`}
+                    aria-label={`Open ${deployment.environment?.name || 'deployment'} on ${deployment.provider?.name}`}
                   >
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
                     {deployment.environment?.name || 'Deploy'}
                   </a>
                 ))}
               {app.deployments.filter((d) => d.url).length > 2 && (
-                <span className="text-primary/70 dark:text-orange-400/70">
+                <span
+                  className="text-primary/70 dark:text-orange-400/70"
+                  aria-label={`${app.deployments.filter((d) => d.url).length - 2} more deployments`}
+                >
                   +{app.deployments.filter((d) => d.url).length - 2}
                 </span>
               )}
