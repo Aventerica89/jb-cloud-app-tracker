@@ -1,6 +1,6 @@
 # jb-cloud-app-tracker
 
-Next.js 15 app to track cloud applications across multiple providers (Vercel, Cloudflare, Railway, etc.) with integrated Claude Code session tracking and maintenance management.
+Next.js 16 app to track cloud applications across multiple providers (Vercel, Cloudflare, Railway, etc.) with integrated Claude Code session tracking and maintenance management.
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ npm run build        # Production build
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router, React Server Components)
+- **Framework**: Next.js 16 (App Router, React Server Components)
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 4 + shadcn/ui components
 - **Database**: Supabase (PostgreSQL with Row-Level Security)

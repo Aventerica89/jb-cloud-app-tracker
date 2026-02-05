@@ -71,22 +71,35 @@ export const LoadingButton = React.forwardRef<
     ref
   ) => {
     const [internalState, setInternalState] = React.useState<ButtonState>(state)
+    const timeoutRef = React.useRef<NodeJS.Timeout>()
 
     React.useEffect(() => {
       setInternalState(state)
     }, [state])
 
     React.useEffect(() => {
+      // Clear any existing timeout before setting a new one
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = undefined
+      }
+
       if (
         resetDelay > 0 &&
         (internalState === 'success' || internalState === 'error')
       ) {
-        const timer = setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           setInternalState('idle')
           onStateReset?.()
+          timeoutRef.current = undefined
         }, resetDelay)
 
-        return () => clearTimeout(timer)
+        return () => {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = undefined
+          }
+        }
       }
     }, [internalState, resetDelay, onStateReset])
 

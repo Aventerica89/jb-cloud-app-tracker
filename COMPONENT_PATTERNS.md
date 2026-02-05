@@ -282,7 +282,7 @@ import { TextInputField } from '@/components/ui/form-field'
 import { useState } from 'react'
 
 function ApplicationForm() {
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   return (
     <form>
@@ -305,8 +305,11 @@ function ApplicationForm() {
 
 ```tsx
 import { TextareaField } from '@/components/ui/form-field'
+import { useState } from 'react'
 
 function DescriptionInput() {
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   return (
     <TextareaField
       id="description"

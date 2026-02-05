@@ -21,6 +21,9 @@ export function AppCard({ app }: AppCardProps) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
+    // Only handle keyboard events on the card itself, not child elements
+    if (e.currentTarget !== e.target) return
+
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       router.push(`/applications/${app.id}`)

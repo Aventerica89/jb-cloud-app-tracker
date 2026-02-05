@@ -11,6 +11,7 @@
  * - ARIA announcements for screen readers
  */
 
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -102,22 +103,17 @@ export function EmptyState({
         )}
 
         {action && (
-          <>
+          <Button
+            asChild={!!action.href}
+            onClick={action.onClick}
+            size={size === 'compact' ? 'sm' : 'default'}
+          >
             {action.href ? (
-              <a href={action.href}>
-                <Button size={size === 'compact' ? 'sm' : 'default'}>
-                  {action.label}
-                </Button>
-              </a>
+              <Link href={action.href}>{action.label}</Link>
             ) : (
-              <Button
-                onClick={action.onClick}
-                size={size === 'compact' ? 'sm' : 'default'}
-              >
-                {action.label}
-              </Button>
+              action.label
             )}
-          </>
+          </Button>
         )}
       </CardContent>
     </Card>
