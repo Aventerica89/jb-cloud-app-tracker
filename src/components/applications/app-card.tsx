@@ -109,10 +109,30 @@ export function AppCard({ app }: AppCardProps) {
             </a>
           )}
           {app.deployments && app.deployments.length > 0 && (
-            <span className="flex items-center gap-1 ml-auto text-primary/70 dark:text-orange-400/70">
-              <ExternalLink className="h-3 w-3" />
-              {app.deployments.length} deployment{app.deployments.length !== 1 ? 's' : ''}
-            </span>
+            <>
+              {app.deployments
+                .filter((d) => d.url)
+                .slice(0, 2)
+                .map((deployment) => (
+                  <a
+                    key={deployment.id}
+                    href={deployment.url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-primary dark:text-orange-400 hover:underline ml-auto"
+                    onClick={(e) => e.stopPropagation()}
+                    title={`${deployment.provider?.name} - ${deployment.environment?.name}`}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {deployment.environment?.name || 'Deploy'}
+                  </a>
+                ))}
+              {app.deployments.filter((d) => d.url).length > 2 && (
+                <span className="text-primary/70 dark:text-orange-400/70">
+                  +{app.deployments.filter((d) => d.url).length - 2}
+                </span>
+              )}
+            </>
           )}
         </div>
       </CardContent>

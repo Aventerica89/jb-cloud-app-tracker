@@ -45,12 +45,29 @@ export default async function ApplicationDetailPage({ params }: Props) {
     notFound()
   }
 
-  // Fetch maintenance and session data in parallel
+  // Fetch maintenance and session data in parallel with error handling
   const [maintenanceStatus, maintenanceRuns, commandTypes, sessionStats] = await Promise.all([
-    getLatestMaintenanceStatus(id),
-    getMaintenanceRuns(id),
-    getMaintenanceCommandTypes(),
-    getSessionStats(id),
+    getLatestMaintenanceStatus(id).catch((err) => {
+      console.error('Failed to fetch maintenance status:', err)
+      return []
+    }),
+    getMaintenanceRuns(id).catch((err) => {
+      console.error('Failed to fetch maintenance runs:', err)
+      return []
+    }),
+    getMaintenanceCommandTypes().catch((err) => {
+      console.error('Failed to fetch command types:', err)
+      return []
+    }),
+    getSessionStats(id).catch((err) => {
+      console.error('Failed to fetch session stats:', err)
+      return {
+        total_sessions: 0,
+        total_duration_minutes: 0,
+        total_tokens: 0,
+        total_commits: 0,
+      }
+    }),
   ])
 
   return (
