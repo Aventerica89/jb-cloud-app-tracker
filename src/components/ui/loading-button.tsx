@@ -12,13 +12,13 @@
  */
 
 import * as React from 'react'
-import { Button, type ButtonProps } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 
 type ButtonState = 'idle' | 'loading' | 'success' | 'error'
 
-interface LoadingButtonProps extends ButtonProps {
+interface LoadingButtonProps extends React.ComponentPropsWithoutRef<typeof Button> {
   /**
    * Current state of the button
    */
