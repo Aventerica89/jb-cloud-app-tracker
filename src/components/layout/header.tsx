@@ -28,7 +28,7 @@ export function Header({ title, description, children }: HeaderProps) {
   const mounted = useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot)
 
   return (
-    <header className="relative flex h-16 items-center justify-between border-b border-border dark:border-orange-500/20 backdrop-blur-md bg-card dark:bg-card/90 px-6 overflow-hidden">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border dark:border-orange-500/20 backdrop-blur-md bg-card/95 dark:bg-card/90 px-6 overflow-hidden">
       <DarkModeTexture variant="sidebar" />
       <div className="relative z-10">
         <h1 className="text-xl font-semibold">{title}</h1>
