@@ -9,6 +9,7 @@ import { getApplications } from '@/lib/actions/applications'
 import { AppCard } from '@/components/applications/app-card'
 import { AppFilters } from '@/components/applications/app-filters'
 import { GitHubImportButton } from '@/components/applications/github-import-button'
+import { AutoConnectButton } from '@/components/applications/auto-connect-button'
 
 interface Props {
   searchParams: Promise<{ search?: string; status?: string }>
@@ -62,6 +63,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         description="Manage your cloud applications"
       >
         <div className="flex items-center gap-2">
+          <AutoConnectButton />
           <GitHubImportButton />
           <Link href="/applications/new">
             <Button>
