@@ -71,7 +71,7 @@ export const LoadingButton = React.forwardRef<
     ref
   ) => {
     const [internalState, setInternalState] = React.useState<ButtonState>(state)
-    const timeoutRef = React.useRef<NodeJS.Timeout>()
+    const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined)
 
     React.useEffect(() => {
       setInternalState(state)
