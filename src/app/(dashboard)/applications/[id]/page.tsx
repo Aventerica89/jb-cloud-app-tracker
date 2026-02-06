@@ -229,7 +229,7 @@ export default async function ApplicationDetailPage({ params }: Props) {
                       )}
                       <div>
                         <Link
-                          href={`/deployments`}
+                          href={`/deployments?provider=${deployment.provider?.id}`}
                           className="font-medium hover:underline"
                         >
                           {deployment.provider?.name}

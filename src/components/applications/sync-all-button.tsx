@@ -22,6 +22,7 @@ export function SyncAllButton() {
     try {
       const apps = await getApplications()
       let totalSynced = 0
+      let totalFailed = 0
 
       const syncPromises = apps.flatMap((app) => {
         const promises: Promise<unknown>[] = []
@@ -31,7 +32,7 @@ export function SyncAllButton() {
               .then((r) => {
                 if (r.success && r.data) totalSynced += r.data.synced
               })
-              .catch(() => {})
+              .catch(() => { totalFailed++ })
           )
         }
         if (app.cloudflare_project_name) {
@@ -40,14 +41,18 @@ export function SyncAllButton() {
               .then((r) => {
                 if (r.success && r.data) totalSynced += r.data.synced
               })
-              .catch(() => {})
+              .catch(() => { totalFailed++ })
           )
         }
         return promises
       })
 
       await Promise.all(syncPromises)
-      toast.success(`Synced ${totalSynced} deployments across all apps`)
+      if (totalFailed > 0) {
+        toast.warning(`Synced ${totalSynced} deployments, but ${totalFailed} sync(s) failed`)
+      } else {
+        toast.success(`Synced ${totalSynced} deployments across all apps`)
+      }
       router.refresh()
     } catch {
       toast.error('Failed to sync some deployments')

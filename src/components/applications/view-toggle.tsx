@@ -21,7 +21,11 @@ export function ViewToggle({ className }: ViewToggleProps) {
   const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
 
-  const currentView = (searchParams.get('view') as ViewMode) || 'grid'
+  const VALID_VIEWS: ViewMode[] = ['grid', 'list', 'compact']
+  const rawView = searchParams.get('view')
+  const currentView: ViewMode = rawView && VALID_VIEWS.includes(rawView as ViewMode)
+    ? (rawView as ViewMode)
+    : 'grid'
 
   const handleViewChange = useCallback(
     (value: string) => {

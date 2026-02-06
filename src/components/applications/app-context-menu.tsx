@@ -74,13 +74,13 @@ export function AppContextMenu({ app, children }: AppContextMenuProps) {
         <ContextMenuSeparator />
 
         {app.live_url && (
-          <ContextMenuItem onClick={() => window.open(app.live_url!, '_blank')}>
+          <ContextMenuItem onClick={() => window.open(app.live_url!, '_blank', 'noopener,noreferrer')}>
             <Globe className="h-4 w-4 mr-2" />
             Open Live Site
           </ContextMenuItem>
         )}
         {app.repository_url && (
-          <ContextMenuItem onClick={() => window.open(app.repository_url!, '_blank')}>
+          <ContextMenuItem onClick={() => window.open(app.repository_url!, '_blank', 'noopener,noreferrer')}>
             <GitBranch className="h-4 w-4 mr-2" />
             Open Repository
           </ContextMenuItem>
