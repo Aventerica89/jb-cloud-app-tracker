@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DeploymentStatusBadge, EnvironmentBadge } from '@/components/ui/status-badge'
+import { LocalTime } from '@/components/ui/local-time'
 import { ExternalLink, GitBranch, Server } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { interactiveStates } from '@/lib/design-tokens'
@@ -78,19 +79,10 @@ export function DeploymentCard({ deployment }: DeploymentCardProps) {
         )}
 
         <div className="flex items-center justify-between pt-2">
-          <time
+          <LocalTime
+            date={deployment.deployed_at}
             className="text-xs text-muted-foreground"
-            dateTime={deployment.deployed_at}
-            aria-label={`Deployed on ${new Date(deployment.deployed_at).toLocaleDateString()}`}
-          >
-            {new Date(deployment.deployed_at).toLocaleDateString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </time>
+          />
 
           {deployment.url && (
             <a
