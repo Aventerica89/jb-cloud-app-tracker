@@ -2,7 +2,11 @@ import Link from 'next/link'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import {
+  AppStatusBadge,
+  DeploymentStatusBadge,
+  EnvironmentBadge,
+} from '@/components/ui/status-badge'
 import {
   AppWindow,
   Cloud,
@@ -17,28 +21,8 @@ import {
   getRecentDeployments,
   getRecentApplications,
 } from '@/lib/actions/stats'
+import { statusColors } from '@/lib/design-tokens'
 import type { DeploymentStatus, AppStatus } from '@/types/database'
-
-const statusColors: Record<DeploymentStatus, string> = {
-  deployed: 'bg-green-500/10 text-green-500 border-green-500/20',
-  pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-  building: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-  failed: 'bg-red-500/10 text-red-500 border-red-500/20',
-  rolled_back: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-}
-
-const appStatusColors: Record<AppStatus, string> = {
-  active: 'bg-green-500/10 text-green-500 border-green-500/20',
-  inactive: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
-  archived: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  maintenance: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-}
-
-const environmentColors: Record<string, string> = {
-  development: 'bg-slate-500/10 text-slate-500 border-slate-500/20',
-  staging: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-  production: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-}
 
 export default async function DashboardPage() {
   const [stats, recentDeployments, recentApps] = await Promise.all([
@@ -122,15 +106,7 @@ export default async function DashboardPage() {
               <div className="flex gap-4">
                 {Object.entries(stats.environmentCounts).map(([env, count]) => (
                   <div key={env} className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={
-                        environmentColors[env] ||
-                        'bg-gray-500/10 text-gray-500 border-gray-500/20'
-                      }
-                    >
-                      {env}
-                    </Badge>
+                    <EnvironmentBadge environment={env} label={env} />
                     <span className="text-sm font-medium">{count}</span>
                   </div>
                 ))}
@@ -186,28 +162,18 @@ export default async function DashboardPage() {
                           <span className="text-xs text-muted-foreground">
                             {deployment.provider.name}
                           </span>
-                          <Badge
-                            variant="outline"
-                            className={`text-xs ${
-                              environmentColors[deployment.environment.slug] ||
-                              ''
-                            }`}
-                          >
-                            {deployment.environment.name}
-                          </Badge>
+                          <EnvironmentBadge
+                            environment={deployment.environment.slug}
+                            label={deployment.environment.name}
+                            size="xs"
+                          />
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className={
-                            statusColors[
-                              deployment.status as DeploymentStatus
-                            ] || ''
-                          }
-                        >
-                          {deployment.status}
-                        </Badge>
+                        <DeploymentStatusBadge
+                          status={deployment.status as DeploymentStatus}
+                          size="sm"
+                        />
                         {deployment.url && (
                           <a
                             href={deployment.url}
@@ -262,12 +228,7 @@ export default async function DashboardPage() {
                       className="flex items-center justify-between p-3 rounded-lg bg-muted/50 dark:bg-muted/30 hover:bg-muted/70 dark:hover:bg-muted/50 transition-colors"
                     >
                       <span className="font-medium truncate">{app.name}</span>
-                      <Badge
-                        variant="outline"
-                        className={appStatusColors[app.status as AppStatus]}
-                      >
-                        {app.status}
-                      </Badge>
+                      <AppStatusBadge status={app.status as AppStatus} size="sm" />
                     </Link>
                   ))}
                 </div>
