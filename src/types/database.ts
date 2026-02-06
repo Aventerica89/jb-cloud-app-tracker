@@ -38,6 +38,7 @@ export interface Application {
   id: string
   user_id: string
   name: string
+  display_name: string | null
   description: string | null
   repository_url: string | null
   live_url: string | null

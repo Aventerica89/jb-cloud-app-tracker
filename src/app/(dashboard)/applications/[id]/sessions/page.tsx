@@ -2,6 +2,14 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb'
 import { ArrowLeft } from 'lucide-react'
 import { getApplication } from '@/lib/actions/applications'
 import { getSessions, getSessionStats } from '@/lib/actions/sessions'
@@ -43,6 +51,27 @@ export default async function SessionsPage({ params }: Props) {
       </Header>
 
       <div className="flex-1 overflow-auto p-6 space-y-6">
+        {/* Breadcrumb navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/applications">Applications</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/applications/${app.id}`}>{app.display_name || app.name}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Sessions</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Stats */}
         <SessionStats stats={stats} />
 

@@ -1,9 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AppStatusBadge } from '@/components/ui/status-badge'
+import { AppFavicon } from '@/components/applications/app-favicon'
+import { ProviderLogo } from '@/components/applications/provider-logo'
 import { ExternalLink, GitBranch, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { interactiveStates } from '@/lib/design-tokens'
@@ -13,17 +16,28 @@ interface AppCardProps {
   app: ApplicationWithRelations
 }
 
+function extractRepoName(url: string): string | null {
+  try {
+    const parts = new URL(url).pathname.split('/').filter(Boolean)
+    return parts.length >= 2 ? parts[parts.length - 1] : null
+  } catch {
+    return null
+  }
+}
+
 export function AppCard({ app }: AppCardProps) {
   const router = useRouter()
+
+  const repoName = app.repository_url ? extractRepoName(app.repository_url) : null
+  const displayName = app.display_name || app.name
+  const showRepoName = repoName && repoName !== app.name && repoName !== displayName
 
   function handleCardClick() {
     router.push(`/applications/${app.id}`)
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    // Only handle keyboard events on the card itself, not child elements
     if (e.currentTarget !== e.target) return
-
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       router.push(`/applications/${app.id}`)
@@ -43,11 +57,23 @@ export function AppCard({ app }: AppCardProps) {
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="article"
-      aria-label={`Application: ${app.name}, Status: ${app.status}`}
+      aria-label={`Application: ${displayName}, Status: ${app.status}`}
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg line-clamp-1">{app.name}</CardTitle>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <AppFavicon
+              url={app.live_url || app.repository_url}
+              name={displayName}
+              size={22}
+            />
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-lg line-clamp-1">{displayName}</CardTitle>
+              {showRepoName && (
+                <p className="text-xs text-muted-foreground truncate">{repoName}</p>
+              )}
+            </div>
+          </div>
           <AppStatusBadge status={app.status} size="sm" />
         </div>
       </CardHeader>
@@ -61,18 +87,23 @@ export function AppCard({ app }: AppCardProps) {
         {app.tags && app.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {app.tags.slice(0, 3).map((tag) => (
-              <Badge
+              <Link
                 key={tag.id}
-                variant="outline"
-                className="text-xs"
-                style={{
-                  backgroundColor: `${tag.color}15`,
-                  borderColor: `${tag.color}40`,
-                  color: tag.color,
-                }}
+                href={`/applications?tags=${tag.id}`}
+                onClick={(e) => e.stopPropagation()}
               >
-                {tag.name}
-              </Badge>
+                <Badge
+                  variant="outline"
+                  className="text-xs hover:opacity-80 transition-opacity"
+                  style={{
+                    backgroundColor: `${tag.color}15`,
+                    borderColor: `${tag.color}40`,
+                    color: tag.color,
+                  }}
+                >
+                  {tag.name}
+                </Badge>
+              </Link>
             ))}
             {app.tags.length > 3 && (
               <Badge variant="outline" className="text-xs">
@@ -83,6 +114,37 @@ export function AppCard({ app }: AppCardProps) {
         )}
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground pt-2 border-t border-border/50">
+          {/* Provider logos */}
+          {app.deployments && app.deployments.length > 0 && (
+            <div className="flex items-center gap-1">
+              {app.deployments
+                .filter((d) => d.provider)
+                .reduce(
+                  (unique, d) => {
+                    if (!unique.find((u) => u.provider?.slug === d.provider?.slug)) {
+                      unique.push(d)
+                    }
+                    return unique
+                  },
+                  [] as typeof app.deployments
+                )
+                .slice(0, 3)
+                .map((d) => (
+                  <Link
+                    key={d.provider!.id}
+                    href={`/providers`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ProviderLogo
+                      slug={d.provider!.slug}
+                      name={d.provider!.name}
+                      size={14}
+                    />
+                  </Link>
+                ))}
+            </div>
+          )}
+
           {app.live_url && (
             <a
               href={app.live_url}

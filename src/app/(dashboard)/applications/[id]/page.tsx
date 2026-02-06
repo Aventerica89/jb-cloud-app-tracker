@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb'
+import {
   ArrowLeft,
   Pencil,
   ExternalLink,
@@ -13,6 +21,7 @@ import {
   Terminal,
 } from 'lucide-react'
 import { getApplication } from '@/lib/actions/applications'
+import { ProviderLogo } from '@/components/applications/provider-logo'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
 import { SyncButton } from '@/components/applications/sync-button'
 import { AutoSync } from '@/components/applications/auto-sync'
@@ -77,7 +86,7 @@ export default async function ApplicationDetailPage({ params }: Props) {
         hasVercelProject={!!app.vercel_project_id}
         hasCloudflareProject={!!app.cloudflare_project_name}
       />
-      <Header title={app.name} description={app.description || undefined}>
+      <Header title={app.display_name || app.name} description={app.description || undefined}>
         <div className="flex items-center gap-2">
           <Link href="/applications">
             <Button variant="outline" size="sm">
@@ -96,6 +105,21 @@ export default async function ApplicationDetailPage({ params }: Props) {
       </Header>
 
       <div className="flex-1 overflow-auto p-6 space-y-6">
+        {/* Breadcrumb navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/applications">Applications</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{app.display_name || app.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Status and meta */}
         <div className="flex flex-wrap items-center gap-4">
           <Badge variant="outline" className={statusColors[app.status]}>
@@ -114,23 +138,37 @@ export default async function ApplicationDetailPage({ params }: Props) {
               <ExternalLink className="h-3 w-3" />
             </a>
           )}
+
+          {app.live_url && (
+            <a
+              href={app.live_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-primary dark:text-orange-400 hover:underline"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Live Site
+            </a>
+          )}
         </div>
 
-        {/* Tags */}
+        {/* Tags - clickable, link to filtered applications */}
         {app.tags && app.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {app.tags.map((tag) => (
-              <Badge
-                key={tag.id}
-                variant="outline"
-                style={{
-                  backgroundColor: `${tag.color}15`,
-                  borderColor: `${tag.color}40`,
-                  color: tag.color,
-                }}
-              >
-                {tag.name}
-              </Badge>
+              <Link key={tag.id} href={`/applications?tags=${tag.id}`}>
+                <Badge
+                  variant="outline"
+                  className="hover:opacity-80 transition-opacity cursor-pointer"
+                  style={{
+                    backgroundColor: `${tag.color}15`,
+                    borderColor: `${tag.color}40`,
+                    color: tag.color,
+                  }}
+                >
+                  {tag.name}
+                </Badge>
+              </Link>
             ))}
           </div>
         )}
@@ -180,10 +218,22 @@ export default async function ApplicationDetailPage({ params }: Props) {
                     className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
                   >
                     <div className="flex items-center gap-3">
+                      {deployment.provider && (
+                        <Link href={`/providers`}>
+                          <ProviderLogo
+                            slug={deployment.provider.slug}
+                            name={deployment.provider.name}
+                            size={24}
+                          />
+                        </Link>
+                      )}
                       <div>
-                        <p className="font-medium">
+                        <Link
+                          href={`/deployments?provider=${deployment.provider?.id}`}
+                          className="font-medium hover:underline"
+                        >
                           {deployment.provider?.name}
-                        </p>
+                        </Link>
                         <p className="text-sm text-muted-foreground">
                           {deployment.environment?.name}
                         </p>

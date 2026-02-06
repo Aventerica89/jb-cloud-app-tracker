@@ -12,6 +12,7 @@ import type { Application, ApplicationWithRelations } from '@/types/database'
 interface GetApplicationsOptions {
   search?: string
   status?: string
+  tags?: string[]
 }
 
 export async function getApplications(
@@ -53,7 +54,7 @@ export async function getApplications(
   if (error) throw error
 
   // Transform nested tags and deployments structure
-  return (data || []).map((app) => ({
+  let results = (data || []).map((app) => ({
     ...app,
     tags: app.application_tags?.map((at: { tag: unknown }) => at.tag) || [],
     deployments:
@@ -62,7 +63,16 @@ export async function getApplications(
         provider: d.provider,
         environment: d.environment,
       })) || [],
-  }))
+  })) as ApplicationWithRelations[]
+
+  // Filter by tags (client-side since Supabase doesn't support filtering through junction tables easily)
+  if (options.tags && options.tags.length > 0) {
+    results = results.filter((app) =>
+      options.tags!.some((tagId) => app.tags?.some((tag) => tag.id === tagId))
+    )
+  }
+
+  return results
 }
 
 export async function getApplication(

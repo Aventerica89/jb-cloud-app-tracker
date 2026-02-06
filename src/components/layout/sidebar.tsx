@@ -10,6 +10,7 @@ import {
   Rocket,
   Settings,
   LogOut,
+  Search,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -46,6 +47,22 @@ export function Sidebar({ onSignOut }: SidebarProps) {
       <div className="relative z-10 flex h-16 items-center gap-2 px-6 border-b border-border dark:border-orange-500/20 bg-card dark:bg-card/90 backdrop-blur-sm">
         <Cloud className="h-6 w-6 text-primary dark:text-orange-400" />
         <span className="font-semibold text-lg">Cloud Tracker</span>
+      </div>
+
+      {/* Search (Cmd+K) */}
+      <div className="relative z-10 px-3 pt-4 pb-2">
+        <button
+          onClick={() => {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
+          }}
+          className="flex items-center gap-3 w-full rounded-lg border border-border dark:border-orange-500/20 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Search className="h-4 w-4" />
+          <span className="flex-1 text-left">Search...</span>
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </button>
       </div>
 
       {/* Navigation */}
