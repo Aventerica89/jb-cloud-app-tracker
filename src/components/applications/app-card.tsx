@@ -58,21 +58,6 @@ export function AppCard({ app }: AppCardProps) {
           </p>
         )}
 
-        {app.tech_stack && app.tech_stack.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {app.tech_stack.slice(0, 4).map((tech) => (
-              <Badge key={tech} variant="secondary" className="text-xs">
-                {tech}
-              </Badge>
-            ))}
-            {app.tech_stack.length > 4 && (
-              <Badge variant="secondary" className="text-xs">
-                +{app.tech_stack.length - 4}
-              </Badge>
-            )}
-          </div>
-        )}
-
         {app.tags && app.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {app.tags.slice(0, 3).map((tag) => (
