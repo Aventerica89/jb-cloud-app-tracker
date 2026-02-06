@@ -72,7 +72,7 @@ export default async function DashboardPage() {
         </Link>
       </Header>
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {statCards.map((stat) => (

@@ -49,7 +49,7 @@ export default function DeploymentsPage() {
         </Link>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <Suspense fallback={<GridSkeleton type="deployment" count={6} />}>
           <DeploymentsList />
         </Suspense>

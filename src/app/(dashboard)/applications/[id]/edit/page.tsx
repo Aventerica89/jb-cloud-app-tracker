@@ -40,7 +40,7 @@ export default async function EditApplicationPage({ params }: Props) {
         </Link>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <Card className="max-w-2xl">
           <CardContent className="pt-6">
             <ApplicationForm application={application} tags={tags} hasVercelToken={hasVercel} hasCloudflareToken={hasCloudflare} />

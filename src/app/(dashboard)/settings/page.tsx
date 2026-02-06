@@ -20,7 +20,7 @@ export default async function SettingsPage() {
         description="Configure integrations and preferences"
       />
 
-      <div className="flex-1 p-6 space-y-6 max-w-2xl">
+      <div className="flex-1 overflow-auto p-6 space-y-6 max-w-2xl">
         {user && <UserProfile user={user} />}
 
         <VercelTokenForm

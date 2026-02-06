@@ -74,7 +74,7 @@ export default async function DeploymentDetailPage({ params }: Props) {
         </div>
       </Header>
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Status and environment */}
         <div className="flex flex-wrap items-center gap-4">
           <Badge

@@ -72,7 +72,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         </div>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <Suspense fallback={null}>
           <AppFilters />
         </Suspense>

@@ -35,7 +35,7 @@ export default async function NewDeploymentPage({ searchParams }: Props) {
         </Link>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <Card className="max-w-2xl">
           <CardContent className="pt-6">
             <DeploymentForm

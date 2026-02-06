@@ -25,7 +25,7 @@ export default async function ProvidersPage() {
         </AddProviderDialog>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         {providers.length === 0 ? (
           <Card className="flex flex-col items-center justify-center p-12">
             <CardContent className="flex flex-col items-center text-center">

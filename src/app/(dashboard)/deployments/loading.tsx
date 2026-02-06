@@ -16,7 +16,7 @@ export default function DeploymentsLoading() {
         </Button>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <GridSkeleton type="deployment" count={6} />
       </div>
     </div>

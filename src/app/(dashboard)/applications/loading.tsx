@@ -17,7 +17,7 @@ export default function ApplicationsLoading() {
         </Button>
       </Header>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 overflow-auto p-6">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-full sm:w-[180px]" />

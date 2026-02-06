@@ -42,7 +42,7 @@ export default async function SessionsPage({ params }: Props) {
         </div>
       </Header>
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Stats */}
         <SessionStats stats={stats} />
 
