@@ -4,6 +4,7 @@ import { VercelTokenForm } from '@/components/settings/vercel-token-form'
 import { CloudflareTokenForm } from '@/components/settings/cloudflare-token-form'
 import { GitHubImportForm } from '@/components/settings/github-import-form'
 import { Changelog } from '@/components/settings/changelog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getUserSettings } from '@/lib/actions/settings'
 import { getCurrentUser } from '@/lib/actions/user'
 
@@ -20,20 +21,28 @@ export default async function SettingsPage() {
         description="Configure integrations and preferences"
       />
 
-      <div className="flex-1 overflow-auto p-6 space-y-6 max-w-2xl">
-        {user && <UserProfile user={user} />}
-
-        <VercelTokenForm
-          hasToken={!!settings?.vercel_token}
-          currentTeamId={settings?.vercel_team_id}
-        />
-        <CloudflareTokenForm
-          hasToken={!!settings?.cloudflare_token}
-          currentAccountId={settings?.cloudflare_account_id}
-        />
-        <GitHubImportForm />
-
-        <Changelog />
+      <div className="flex-1 overflow-auto p-6">
+        <Tabs defaultValue="connections" className="max-w-2xl">
+          <TabsList>
+            <TabsTrigger value="connections">API Connections</TabsTrigger>
+            <TabsTrigger value="changelog">Changelog</TabsTrigger>
+          </TabsList>
+          <TabsContent value="connections" className="space-y-6">
+            {user && <UserProfile user={user} />}
+            <VercelTokenForm
+              hasToken={!!settings?.vercel_token}
+              currentTeamId={settings?.vercel_team_id}
+            />
+            <CloudflareTokenForm
+              hasToken={!!settings?.cloudflare_token}
+              currentAccountId={settings?.cloudflare_account_id}
+            />
+            <GitHubImportForm />
+          </TabsContent>
+          <TabsContent value="changelog">
+            <Changelog />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

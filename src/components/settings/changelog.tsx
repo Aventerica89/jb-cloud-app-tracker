@@ -84,7 +84,7 @@ export function Changelog() {
         <CardDescription>Recent updates and improvements</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="max-h-[300px] overflow-y-auto pr-4 space-y-6">
+        <div className="space-y-6">
           {changelog.map((entry) => (
             <ChangelogVersion key={entry.version} entry={entry} />
           ))}

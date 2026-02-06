@@ -9,6 +9,17 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.4.0',
+    date: '2026-02-05',
+    changes: [
+      { type: 'added', description: 'Auto-Connect button to match apps with Vercel/Cloudflare projects' },
+      { type: 'added', description: 'Dynamic API lookups for provider matching during GitHub import' },
+      { type: 'added', description: 'LocalTime component for timezone-aware date display' },
+      { type: 'changed', description: 'Settings page reorganized with tabbed navigation' },
+      { type: 'fixed', description: 'Page header stays fixed while content scrolls' },
+    ],
+  },
+  {
     version: '1.3.0',
     date: '2026-01-29',
     changes: [
