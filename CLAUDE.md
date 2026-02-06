@@ -702,6 +702,51 @@ See `src/lib/changelog.ts` for full version history.
 - Mobile PWA support
 - Responsive navigation
 
+## Session Context (for next Claude)
+
+### PR #12 — Bidirectional Navigation, Logos, Multi-View (Feb 2026)
+
+**What was built:**
+- 13 provider brand logo SVGs in `public/logos/` + `src/lib/provider-logos.ts` utility
+- Custom Cloud Tracker favicon (`src/app/icon.svg`, `src/app/apple-icon.tsx`)
+- Grid/List/Compact view toggle (`src/components/applications/view-toggle.tsx`)
+- Tag filter toggle bar with multi-select (`src/components/applications/tag-filter-bar.tsx`)
+- Breadcrumb navigation on app detail + sessions pages
+- Clickable tags throughout (filter applications list via `?tags=id1,id2`)
+- Command palette Cmd+K (`src/components/layout/command-palette.tsx`)
+- Context menu on app cards (`src/components/applications/app-context-menu.tsx`)
+- Sync-all button (`src/components/applications/sync-all-button.tsx`)
+- App favicons via Google Favicon API (`src/components/applications/app-favicon.tsx`)
+- display_name field for applications (migration 008)
+- 11 new shadcn/ui components (toggle, breadcrumb, command, context-menu, scroll-area, tooltip, hover-card, collapsible, progress, switch)
+
+**PR review fixes applied:**
+- Provider links go to `/deployments?provider=${id}` (not generic /deployments)
+- CSS selector typo fixed in command.tsx
+- Progress component passes value prop for accessibility
+- Sync-all tracks failures separately with warning toast
+- noopener,noreferrer on window.open calls (tabnabbing fix)
+- View query param validated against allowed modes
+
+### Approved but NOT yet implemented:
+- Magic UI animated grid background
+- Magic UI dock for quick actions
+- Motion Primitives fade transitions for view switching
+- GitHub as a provider with auto-sync
+- Wire AppContextMenu into AppCard (component exists at `src/components/applications/app-context-menu.tsx`, not integrated)
+- Add display_name to create/edit forms + Zod schemas
+- Run migration `008_add_display_name.sql` against Supabase
+
+### User Preferences
+- Prefers actual brand asset icons/favicons over icon libraries
+- Wants bidirectional navigation everywhere
+- Uses dark mode with orange accent theme
+
+### Known Issues
+- shadcn CLI (`npx shadcn add`) may 403 in sandboxed environments — create components manually
+- Pre-existing test file errors in `blur-blob-bg.test.tsx` (missing vitest types) — unrelated to new work
+- Production build can fail due to Google Fonts TLS issues in sandboxed envs — not a code issue, typecheck is the reliable gate
+
 ## Resources
 
 - **Next.js Docs**: https://nextjs.org/docs
