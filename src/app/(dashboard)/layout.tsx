@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { MobileHeader } from '@/components/layout/mobile-header'
+import { CommandPalette } from '@/components/layout/command-palette'
 import { DarkModeTexture } from '@/components/ui/dark-mode-texture'
 import { signOut } from '@/lib/actions/auth'
 
@@ -33,6 +34,9 @@ export default function DashboardLayout({
 
       {/* Main content area */}
       <main className="relative z-10 flex-1 overflow-auto bg-muted/40 dark:bg-transparent">{children}</main>
+
+      {/* Global command palette (Cmd+K) */}
+      <CommandPalette />
     </div>
   )
 }

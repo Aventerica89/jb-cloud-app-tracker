@@ -78,10 +78,10 @@ export default async function TagsPage() {
                     </Badge>
                   </div>
 
-                  {/* Link to applications */}
+                  {/* Link to applications - uses tags filter param */}
                   {tag.app_count > 0 && (
                     <Link
-                      href={`/applications?tag=${tag.id}`}
+                      href={`/applications?tags=${tag.id}`}
                       className="block text-xs text-primary dark:text-orange-400 hover:underline"
                     >
                       View applications →

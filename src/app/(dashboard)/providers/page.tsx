@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Cloud, ExternalLink, Rocket, AppWindow } from 'lucide-react'
 import { getProvidersWithCounts } from '@/lib/actions/providers'
+import { ProviderLogo } from '@/components/applications/provider-logo'
 import { AddProviderDialog } from '@/components/providers/add-provider-dialog'
 import { ProviderActions } from '@/components/providers/provider-actions'
 
@@ -53,7 +54,7 @@ export default async function ProvidersPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 dark:bg-orange-500/10">
-                        <Cloud className="h-5 w-5 text-primary dark:text-orange-400" />
+                        <ProviderLogo slug={provider.slug} name={provider.name} size={24} showTooltip={false} />
                       </div>
                       <div>
                         <CardTitle className="text-base">{provider.name}</CardTitle>
@@ -101,15 +102,25 @@ export default async function ProvidersPage() {
                     </Badge>
                   </div>
 
-                  {/* Link to deployments */}
-                  {provider.deployment_count > 0 && (
-                    <Link
-                      href={`/deployments?provider=${provider.id}`}
-                      className="block text-xs text-primary dark:text-orange-400 hover:underline"
-                    >
-                      View deployments →
-                    </Link>
-                  )}
+                  {/* Bidirectional links */}
+                  <div className="flex items-center gap-4">
+                    {provider.deployment_count > 0 && (
+                      <Link
+                        href={`/deployments?provider=${provider.id}`}
+                        className="text-xs text-primary dark:text-orange-400 hover:underline"
+                      >
+                        View deployments →
+                      </Link>
+                    )}
+                    {provider.app_count > 0 && (
+                      <Link
+                        href={`/applications`}
+                        className="text-xs text-primary dark:text-orange-400 hover:underline"
+                      >
+                        View apps →
+                      </Link>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
