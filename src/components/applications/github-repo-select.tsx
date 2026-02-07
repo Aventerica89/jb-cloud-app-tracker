@@ -44,14 +44,14 @@ export function GitHubRepoSelect({ value, hasToken }: GitHubRepoSelectProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor="github_repo_name">GitHub Repository</Label>
-      <Select name="github_repo_name" defaultValue={value || ''}>
+      <Select name="github_repo_name" defaultValue={value || '__none__'}>
         <SelectTrigger id="github_repo_name">
           <SelectValue
             placeholder={isLoading ? 'Loading repos...' : 'Select a repository'}
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">None</SelectItem>
+          <SelectItem value="__none__">None</SelectItem>
           {repos.map((repo) => (
             <SelectItem key={repo.full_name} value={repo.full_name}>
               {repo.full_name}

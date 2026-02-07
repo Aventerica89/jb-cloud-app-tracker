@@ -206,7 +206,7 @@ export async function createApplication(
       live_url: live_url || null,
       vercel_project_id: vercel_project_id || null,
       cloudflare_project_name: cloudflare_project_name || null,
-      github_repo_name: github_repo_name || null,
+      github_repo_name: github_repo_name === '__none__' ? null : github_repo_name || null,
     })
     .select('id')
     .single()
@@ -289,7 +289,7 @@ export async function updateApplication(
       live_url: live_url === '' ? null : live_url,
       vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
       cloudflare_project_name: cloudflare_project_name === '' ? null : cloudflare_project_name,
-      github_repo_name: github_repo_name === '' ? null : github_repo_name,
+      github_repo_name: !github_repo_name || github_repo_name === '__none__' ? null : github_repo_name,
     })
     .eq('id', id)
 
