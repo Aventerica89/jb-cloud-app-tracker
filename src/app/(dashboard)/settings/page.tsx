@@ -2,6 +2,7 @@ import { Header } from '@/components/layout/header'
 import { UserProfile } from '@/components/settings/user-profile'
 import { VercelTokenForm } from '@/components/settings/vercel-token-form'
 import { CloudflareTokenForm } from '@/components/settings/cloudflare-token-form'
+import { GitHubTokenForm } from '@/components/settings/github-token-form'
 import { GitHubImportForm } from '@/components/settings/github-import-form'
 import { Changelog } from '@/components/settings/changelog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -36,6 +37,10 @@ export default async function SettingsPage() {
             <CloudflareTokenForm
               hasToken={!!settings?.cloudflare_token}
               currentAccountId={settings?.cloudflare_account_id}
+            />
+            <GitHubTokenForm
+              hasToken={!!settings?.github_token}
+              currentUsername={settings?.github_username}
             />
             <GitHubImportForm />
           </TabsContent>

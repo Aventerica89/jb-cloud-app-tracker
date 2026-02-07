@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DeploymentStatusBadge, EnvironmentBadge } from '@/components/ui/status-badge'
-import { LocalTime } from '@/components/ui/local-time'
-import { ExternalLink, GitBranch, Server } from 'lucide-react'
+import { ExternalLink, GitBranch } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { interactiveStates } from '@/lib/design-tokens'
+import { getProviderIcon } from '@/lib/utils/provider-icons'
+import { RelativeTime } from '@/components/ui/relative-time'
 import type {
   CloudProvider,
   Environment,
@@ -29,6 +30,8 @@ interface DeploymentCardProps {
 }
 
 export function DeploymentCard({ deployment }: DeploymentCardProps) {
+  const ProviderIcon = getProviderIcon(deployment.provider.slug)
+
   return (
     <Card
       className={cn(
@@ -59,7 +62,7 @@ export function DeploymentCard({ deployment }: DeploymentCardProps) {
       <CardContent className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="flex items-center gap-1">
-            <Server className="h-3 w-3" aria-hidden="true" />
+            <ProviderIcon className="h-3 w-3" />
             {deployment.provider.name}
           </Badge>
           <EnvironmentBadge
@@ -79,7 +82,7 @@ export function DeploymentCard({ deployment }: DeploymentCardProps) {
         )}
 
         <div className="flex items-center justify-between pt-2">
-          <LocalTime
+          <RelativeTime
             date={deployment.deployed_at}
             className="text-xs text-muted-foreground"
           />

@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getVercelDeployments } from './vercel'
 import { getCloudflareDeployments } from './cloudflare'
+import { getGitHubDeployments } from './github'
+import { mapGitHubStatus, mapGitHubEnvironment } from '@/lib/utils/github-mappers'
 import { getEnvironments } from './environments'
 import type { ActionResult } from '@/types/actions'
 import type { DeploymentStatus, VercelDeployment, CloudflareDeployment } from '@/types/database'
@@ -289,5 +291,116 @@ export async function syncCloudflareDeployments(
       created,
       updated,
     },
+  }
+}
+
+export async function syncGitHubDeployments(
+  applicationId: string
+): Promise<ActionResult<{ synced: number; created: number; updated: number }>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const { data: app, error: appError } = await supabase
+    .from('applications')
+    .select('id, github_repo_name, user_id')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (appError || !app) {
+    return { success: false, error: 'Application not found' }
+  }
+
+  if (!app.github_repo_name) {
+    return { success: false, error: 'No GitHub repo linked' }
+  }
+
+  // Find GitHub provider
+  const { data: githubProvider } = await supabase
+    .from('cloud_providers')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('slug', 'github')
+    .single()
+
+  if (!githubProvider) {
+    return { success: false, error: 'GitHub provider not found' }
+  }
+
+  const environments = await getEnvironments()
+  const envMap: Record<string, string> = {}
+  for (const env of environments) {
+    envMap[env.slug] = env.id
+  }
+
+  const [owner, repo] = app.github_repo_name.split('/')
+  if (!owner || !repo) {
+    return { success: false, error: 'Invalid repo name format' }
+  }
+
+  const ghDeployments = await getGitHubDeployments(owner, repo)
+
+  if (ghDeployments.length === 0) {
+    return { success: true, data: { synced: 0, created: 0, updated: 0 } }
+  }
+
+  let created = 0
+  let updated = 0
+
+  for (const { deployment: gd, latestStatus } of ghDeployments) {
+    const externalId = `github:${gd.id}`
+    const envSlug = mapGitHubEnvironment(gd.environment)
+    const environmentId = envMap[envSlug] || envMap.development
+    const status = mapGitHubStatus(latestStatus?.state ?? null)
+    const deployedAt = new Date(gd.created_at).toISOString()
+    const url = latestStatus?.environment_url ?? null
+
+    const { data: existing } = await supabase
+      .from('deployments')
+      .select('id, status')
+      .eq('application_id', applicationId)
+      .eq('external_id', externalId)
+      .single()
+
+    if (existing) {
+      if (existing.status !== status) {
+        await supabase
+          .from('deployments')
+          .update({ status, url })
+          .eq('id', existing.id)
+        updated++
+      }
+    } else {
+      const { error: insertError } = await supabase.from('deployments').insert({
+        application_id: applicationId,
+        provider_id: githubProvider.id,
+        environment_id: environmentId,
+        external_id: externalId,
+        url,
+        branch: gd.ref || null,
+        commit_sha: gd.sha || null,
+        status,
+        deployed_at: deployedAt,
+      })
+
+      if (!insertError) {
+        created++
+      }
+    }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/deployments')
+  revalidatePath(`/applications/${applicationId}`)
+
+  return {
+    success: true,
+    data: { synced: ghDeployments.length, created, updated },
   }
 }

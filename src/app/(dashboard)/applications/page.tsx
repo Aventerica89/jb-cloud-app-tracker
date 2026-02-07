@@ -16,6 +16,7 @@ import { TagFilterBar } from '@/components/applications/tag-filter-bar'
 import { SyncAllButton } from '@/components/applications/sync-all-button'
 import { GitHubImportButton } from '@/components/applications/github-import-button'
 import { AutoConnectButton } from '@/components/applications/auto-connect-button'
+import { ApplicationsGrid } from '@/components/applications/applications-grid'
 
 interface Props {
   searchParams: Promise<{ search?: string; status?: string; view?: string; tags?: string }>
@@ -74,13 +75,7 @@ async function ApplicationsList({
     )
   }
 
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {applications.map((app) => (
-        <AppCard key={app.id} app={app} />
-      ))}
-    </div>
-  )
+  return <ApplicationsGrid applications={applications} />
 }
 
 async function TagFilterBarWrapper() {

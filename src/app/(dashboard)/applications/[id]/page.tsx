@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Header } from '@/components/layout/header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -17,13 +19,15 @@ import {
   Pencil,
   ExternalLink,
   GitBranch,
+  Globe,
   Rocket,
   Terminal,
 } from 'lucide-react'
-import { getApplication } from '@/lib/actions/applications'
+import { getApplication, getApplicationDeployments } from '@/lib/actions/applications'
+import { getTodos } from '@/lib/actions/todos'
+import { getNotes } from '@/lib/actions/notes'
 import { ProviderLogo } from '@/components/applications/provider-logo'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
-import { SyncButton } from '@/components/applications/sync-button'
 import { AutoSync } from '@/components/applications/auto-sync'
 import { MaintenanceChecklist } from '@/components/maintenance/maintenance-checklist'
 import { MaintenanceHistory } from '@/components/maintenance/maintenance-history'
@@ -34,28 +38,50 @@ import {
   getMaintenanceCommandTypes,
 } from '@/lib/actions/maintenance'
 import { getSessionStats } from '@/lib/actions/sessions'
-
-const statusColors = {
-  active: 'bg-green-500/10 text-green-500 border-green-500/20',
-  inactive: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
-  archived: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  maintenance: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-}
+import { DetailTabs } from '@/components/applications/detail-tabs'
+import { DeploymentsTab } from '@/components/applications/deployments-tab'
+import { TodosTab } from '@/components/applications/todos-tab'
+import { NotesTab } from '@/components/applications/notes-tab'
+import { appStatusColors } from '@/lib/utils/status-colors'
+import { RelativeTime } from '@/components/ui/relative-time'
 
 interface Props {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ tab?: string }>
 }
 
-export default async function ApplicationDetailPage({ params }: Props) {
+function TabsSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-10 w-80" />
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-16 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default async function ApplicationDetailPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { tab } = await searchParams
   const app = await getApplication(id)
 
   if (!app) {
     notFound()
   }
 
-  // Fetch maintenance and session data in parallel with error handling
-  const [maintenanceStatus, maintenanceRuns, commandTypes, sessionStats] = await Promise.all([
+  // Fetch all data in parallel with error handling
+  const [
+    maintenanceStatus,
+    maintenanceRuns,
+    commandTypes,
+    sessionStats,
+    { data: initialDeployments, hasMore },
+    initialTodos,
+    initialNotes,
+  ] = await Promise.all([
     getLatestMaintenanceStatus(id).catch((err) => {
       console.error('Failed to fetch maintenance status:', err)
       return []
@@ -77,7 +103,12 @@ export default async function ApplicationDetailPage({ params }: Props) {
         total_commits: 0,
       }
     }),
+    getApplicationDeployments(id),
+    getTodos(id),
+    getNotes(id),
   ])
+
+  const hasGitHubRepo = !!app.github_repo_name
 
   return (
     <div className="flex flex-col h-full">
@@ -85,6 +116,7 @@ export default async function ApplicationDetailPage({ params }: Props) {
         applicationId={app.id}
         hasVercelProject={!!app.vercel_project_id}
         hasCloudflareProject={!!app.cloudflare_project_name}
+        hasGitHubRepo={hasGitHubRepo}
       />
       <Header title={app.display_name || app.name} description={app.description || undefined}>
         <div className="flex items-center gap-2">
@@ -120,11 +152,26 @@ export default async function ApplicationDetailPage({ params }: Props) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Status and meta */}
+        {/* Status, links, and meta */}
         <div className="flex flex-wrap items-center gap-4">
-          <Badge variant="outline" className={statusColors[app.status]}>
+          <Badge variant="outline" className={appStatusColors[app.status]}>
             {app.status}
           </Badge>
+
+          {app.live_url && (
+            <a
+              href={app.live_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Globe className="h-4 w-4" />
+              {(() => {
+                try { return new URL(app.live_url).hostname } catch { return 'Live' }
+              })()}
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
 
           {app.repository_url && (
             <a
@@ -139,17 +186,10 @@ export default async function ApplicationDetailPage({ params }: Props) {
             </a>
           )}
 
-          {app.live_url && (
-            <a
-              href={app.live_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-primary dark:text-orange-400 hover:underline"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Live Site
-            </a>
-          )}
+          <RelativeTime
+            date={app.updated_at}
+            className="text-sm text-muted-foreground"
+          />
         </div>
 
         {/* Tags - clickable, link to filtered applications */}
@@ -191,76 +231,34 @@ export default async function ApplicationDetailPage({ params }: Props) {
           </Card>
         )}
 
-        {/* Deployments */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">Deployments</CardTitle>
-            <div className="flex items-center gap-2">
-              <SyncButton
+        {/* Tabbed content - deployments/todos/notes */}
+        <Suspense fallback={<TabsSkeleton />}>
+          <DetailTabs
+            appId={app.id}
+            deploymentsContent={
+              <DeploymentsTab
                 applicationId={app.id}
+                initialDeployments={initialDeployments}
+                hasMore={hasMore}
                 hasVercelProject={!!app.vercel_project_id}
                 hasCloudflareProject={!!app.cloudflare_project_name}
+                hasGitHubRepo={hasGitHubRepo}
               />
-              <Link href={`/deployments/new?app=${app.id}`}>
-                <Button size="sm">
-                  <Rocket className="mr-2 h-4 w-4" />
-                  Add Deployment
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {app.deployments && app.deployments.length > 0 ? (
-              <div className="space-y-3">
-                {app.deployments.map((deployment) => (
-                  <div
-                    key={deployment.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      {deployment.provider && (
-                        <Link href={`/providers`}>
-                          <ProviderLogo
-                            slug={deployment.provider.slug}
-                            name={deployment.provider.name}
-                            size={24}
-                          />
-                        </Link>
-                      )}
-                      <div>
-                        <Link
-                          href={`/deployments?provider=${deployment.provider?.id}`}
-                          className="font-medium hover:underline"
-                        >
-                          {deployment.provider?.name}
-                        </Link>
-                        <p className="text-sm text-muted-foreground">
-                          {deployment.environment?.name}
-                        </p>
-                      </div>
-                    </div>
-                    {deployment.url && (
-                      <a
-                        href={deployment.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-sm text-primary hover:underline"
-                      >
-                        Visit
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No deployments yet. Add a deployment to track where this app is
-                hosted.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            }
+            todosContent={
+              <TodosTab
+                applicationId={app.id}
+                initialTodos={initialTodos}
+              />
+            }
+            notesContent={
+              <NotesTab
+                applicationId={app.id}
+                initialNotes={initialNotes}
+              />
+            }
+          />
+        </Suspense>
 
         {/* Maintenance */}
         <div className="flex items-center justify-between">

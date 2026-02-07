@@ -20,6 +20,7 @@ import {
 } from '@/lib/actions/applications'
 import { VercelProjectSelect } from './vercel-project-select'
 import { CloudflareProjectSelect } from './cloudflare-project-select'
+import { GitHubRepoSelect } from './github-repo-select'
 import { toast } from 'sonner'
 import type { Application, Tag, AppStatus } from '@/types/database'
 
@@ -28,9 +29,10 @@ interface ApplicationFormProps {
   tags: Tag[]
   hasVercelToken?: boolean
   hasCloudflareToken?: boolean
+  hasGitHubToken?: boolean
 }
 
-export function ApplicationForm({ application, tags, hasVercelToken = false, hasCloudflareToken = false }: ApplicationFormProps) {
+export function ApplicationForm({ application, tags, hasVercelToken = false, hasCloudflareToken = false, hasGitHubToken = false }: ApplicationFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<AppStatus>(
@@ -209,6 +211,11 @@ export function ApplicationForm({ application, tags, hasVercelToken = false, has
         value={cloudflareProjectName}
         onChange={setCloudflareProjectName}
         hasToken={hasCloudflareToken}
+      />
+
+      <GitHubRepoSelect
+        value={application?.github_repo_name}
+        hasToken={hasGitHubToken}
       />
 
       <div className="flex justify-end gap-4">

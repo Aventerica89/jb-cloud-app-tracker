@@ -37,6 +37,11 @@ export async function hasCloudflareToken(): Promise<boolean> {
   return !!settings?.cloudflare_token && !!settings?.cloudflare_account_id
 }
 
+export async function hasGitHubToken(): Promise<boolean> {
+  const settings = await getUserSettings()
+  return !!settings?.github_token
+}
+
 export async function saveVercelSettings(
   formData: FormData
 ): Promise<ActionResult> {
@@ -156,6 +161,72 @@ export async function deleteCloudflareSettings(): Promise<ActionResult> {
     .update({
       cloudflare_token: null,
       cloudflare_account_id: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}
+
+export async function saveGitHubSettings(
+  formData: FormData
+): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const githubToken = formData.get('github_token') as string
+  const githubUsername = (formData.get('github_username') as string) || null
+
+  if (!githubToken) {
+    return { success: false, error: 'GitHub token is required' }
+  }
+
+  const { error } = await supabase.from('user_settings').upsert(
+    {
+      user_id: user.id,
+      github_token: githubToken,
+      github_username: githubUsername,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' }
+  )
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/applications')
+  return { success: true }
+}
+
+export async function deleteGitHubSettings(): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const { error } = await supabase
+    .from('user_settings')
+    .update({
+      github_token: null,
+      github_username: null,
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', user.id)

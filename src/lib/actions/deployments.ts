@@ -16,10 +16,27 @@ interface DeploymentWithApplication extends DeploymentWithRelations {
   }
 }
 
-export async function getDeployments(): Promise<DeploymentWithApplication[]> {
-  const supabase = await createClient()
+interface GetDeploymentsOptions {
+  search?: string
+  status?: string
+  provider?: string
+  environment?: string
+  page?: number
+  limit?: number
+}
 
-  const { data, error } = await supabase
+interface PaginatedDeployments {
+  data: DeploymentWithApplication[]
+  total: number
+}
+
+export async function getDeployments(
+  options: GetDeploymentsOptions = {}
+): Promise<PaginatedDeployments> {
+  const supabase = await createClient()
+  const { search, status, provider, environment, page = 1, limit = 12 } = options
+
+  let query = supabase
     .from('deployments')
     .select(
       `
@@ -27,13 +44,63 @@ export async function getDeployments(): Promise<DeploymentWithApplication[]> {
       provider:cloud_providers (*),
       environment:environments (*),
       application:applications (id, name)
-    `
+    `,
+      { count: 'exact' }
     )
+
+  if (status && status !== 'all') {
+    query = query.eq('status', status)
+  }
+
+  if (provider && provider !== 'all') {
+    query = query.eq('provider_id', provider)
+  }
+
+  if (environment && environment !== 'all') {
+    // Look up environment ID from slug
+    const { data: envData } = await supabase
+      .from('environments')
+      .select('id')
+      .eq('slug', environment)
+      .single()
+    if (envData) {
+      query = query.eq('environment_id', envData.id)
+    }
+  }
+
+  if (search) {
+    const sanitized = search
+      .replace(/[\\%_]/g, '\\$&')
+      .replace(/[(),.:]/g, '')
+    // Look up matching application IDs first
+    const { data: matchingApps } = await supabase
+      .from('applications')
+      .select('id')
+      .ilike('name', `%${sanitized}%`)
+    if (matchingApps && matchingApps.length > 0) {
+      query = query.in(
+        'application_id',
+        matchingApps.map((a) => a.id)
+      )
+    } else {
+      // No matching apps, return empty
+      return { data: [], total: 0 }
+    }
+  }
+
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  const { data, error, count } = await query
     .order('deployed_at', { ascending: false })
+    .range(from, to)
 
   if (error) throw error
 
-  return (data || []) as DeploymentWithApplication[]
+  return {
+    data: (data || []) as DeploymentWithApplication[],
+    total: count ?? 0,
+  }
 }
 
 export async function getDeployment(

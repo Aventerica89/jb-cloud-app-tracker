@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
 import { getApplication } from '@/lib/actions/applications'
 import { getTags } from '@/lib/actions/tags'
-import { hasVercelToken, hasCloudflareToken } from '@/lib/actions/settings'
+import { hasVercelToken, hasCloudflareToken, hasGitHubToken } from '@/lib/actions/settings'
 import { ApplicationForm } from '@/components/applications/application-form'
 
 interface Props {
@@ -15,11 +15,12 @@ interface Props {
 
 export default async function EditApplicationPage({ params }: Props) {
   const { id } = await params
-  const [application, tags, hasVercel, hasCloudflare] = await Promise.all([
+  const [application, tags, hasVercel, hasCloudflare, hasGitHub] = await Promise.all([
     getApplication(id),
     getTags(),
     hasVercelToken(),
     hasCloudflareToken(),
+    hasGitHubToken(),
   ])
 
   if (!application) {
@@ -43,7 +44,7 @@ export default async function EditApplicationPage({ params }: Props) {
       <div className="flex-1 overflow-auto p-6">
         <Card className="max-w-2xl">
           <CardContent className="pt-6">
-            <ApplicationForm application={application} tags={tags} hasVercelToken={hasVercel} hasCloudflareToken={hasCloudflare} />
+            <ApplicationForm application={application} tags={tags} hasVercelToken={hasVercel} hasCloudflareToken={hasCloudflare} hasGitHubToken={hasGitHub} />
           </CardContent>
         </Card>
       </div>

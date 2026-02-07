@@ -11,6 +11,8 @@ export interface UserSettings {
   vercel_team_id: string | null
   cloudflare_token: string | null
   cloudflare_account_id: string | null
+  github_token: string | null
+  github_username: string | null
   created_at: string
   updated_at: string
 }
@@ -46,6 +48,7 @@ export interface Application {
   status: AppStatus
   vercel_project_id: string | null
   cloudflare_project_name: string | null
+  github_repo_name: string | null
   created_at: string
   updated_at: string
 }
@@ -99,6 +102,27 @@ export interface MaintenanceRun {
   run_at: string
   created_at: string
 }
+
+// Todo and Note types
+export interface AppTodo {
+  id: string
+  application_id: string
+  user_id: string
+  text: string
+  completed: boolean
+  sort_order: number
+  created_at: string
+}
+
+export interface AppNote {
+  id: string
+  application_id: string
+  user_id: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
 
 // Extended types (with relations)
 export interface ApplicationWithRelations extends Application {
@@ -164,6 +188,7 @@ export interface CreateApplicationInput {
   tag_ids?: string[]
   vercel_project_id?: string
   cloudflare_project_name?: string
+  github_repo_name?: string
 }
 
 export interface UpdateApplicationInput {
@@ -177,6 +202,7 @@ export interface UpdateApplicationInput {
   tag_ids?: string[]
   vercel_project_id?: string
   cloudflare_project_name?: string
+  github_repo_name?: string
 }
 
 export interface CreateDeploymentInput {
@@ -287,4 +313,32 @@ export interface CloudflareDeployment {
     status: 'active' | 'idle' | 'canceled' | 'failure' | 'success'
   }
   created_on: string
+}
+
+// GitHub API types
+export interface GitHubDeployment {
+  id: number
+  sha: string
+  ref: string
+  environment: string
+  description: string | null
+  created_at: string
+  updated_at: string
+  statuses_url: string
+}
+
+export interface GitHubDeploymentStatus {
+  id: number
+  state: 'success' | 'error' | 'failure' | 'pending' | 'queued' | 'in_progress' | 'inactive'
+  environment_url: string | null
+  created_at: string
+}
+
+export interface GitHubRepo {
+  id: number
+  name: string
+  full_name: string
+  html_url: string
+  description: string | null
+  default_branch: string
 }

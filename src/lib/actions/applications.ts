@@ -35,11 +35,9 @@ export async function getApplications(
   )
 
   if (options.search) {
-    // Sanitize search input to prevent filter injection
-    // Escape special PostgREST characters and SQL wildcards
     const sanitizedSearch = options.search
-      .replace(/[\\%_]/g, '\\$&')  // Escape SQL wildcards
-      .replace(/[(),.:]/g, '')     // Remove PostgREST special chars
+      .replace(/[\\%_]/g, '\\$&')
+      .replace(/[(),.:]/g, '')
     query = query.or(
       `name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`
     )
@@ -115,6 +113,43 @@ export async function getApplication(
   }
 }
 
+interface PaginatedDeployments {
+  data: import('@/types/database').DeploymentWithRelations[]
+  hasMore: boolean
+}
+
+export async function getApplicationDeployments(
+  applicationId: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<PaginatedDeployments> {
+  const supabase = await createClient()
+  const from = (page - 1) * limit
+  const to = from + limit
+
+  const { data, error } = await supabase
+    .from('deployments')
+    .select(
+      `
+      *,
+      provider:cloud_providers (*),
+      environment:environments (*)
+    `
+    )
+    .eq('application_id', applicationId)
+    .order('deployed_at', { ascending: false })
+    .range(from, to)
+
+  if (error) throw error
+
+  const results = (data || []) as import('@/types/database').DeploymentWithRelations[]
+
+  return {
+    data: results.slice(0, limit),
+    hasMore: results.length > limit,
+  }
+}
+
 export async function createApplication(
   formData: FormData
 ): Promise<ActionResult<{ id: string }>> {
@@ -149,6 +184,7 @@ export async function createApplication(
       : [],
     vercel_project_id: formData.get('vercel_project_id') || undefined,
     cloudflare_project_name: formData.get('cloudflare_project_name') || undefined,
+    github_repo_name: formData.get('github_repo_name') || undefined,
   }
 
   const parsed = createApplicationSchema.safeParse(rawData)
@@ -160,7 +196,7 @@ export async function createApplication(
     }
   }
 
-  const { tag_ids, vercel_project_id, cloudflare_project_name, live_url, ...applicationData } = parsed.data
+  const { tag_ids, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...applicationData } = parsed.data
 
   const { data, error } = await supabase
     .from('applications')
@@ -170,6 +206,7 @@ export async function createApplication(
       live_url: live_url || null,
       vercel_project_id: vercel_project_id || null,
       cloudflare_project_name: cloudflare_project_name || null,
+      github_repo_name: github_repo_name || null,
     })
     .select('id')
     .single()
@@ -231,6 +268,7 @@ export async function updateApplication(
       : undefined,
     vercel_project_id: formData.get('vercel_project_id'),
     cloudflare_project_name: formData.get('cloudflare_project_name'),
+    github_repo_name: formData.get('github_repo_name'),
   }
 
   const parsed = updateApplicationSchema.safeParse(rawData)
@@ -242,7 +280,7 @@ export async function updateApplication(
     }
   }
 
-  const { id, tag_ids, vercel_project_id, cloudflare_project_name, live_url, ...updateData } = parsed.data
+  const { id, tag_ids, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...updateData } = parsed.data
 
   const { error } = await supabase
     .from('applications')
@@ -251,6 +289,7 @@ export async function updateApplication(
       live_url: live_url === '' ? null : live_url,
       vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
       cloudflare_project_name: cloudflare_project_name === '' ? null : cloudflare_project_name,
+      github_repo_name: github_repo_name === '' ? null : github_repo_name,
     })
     .eq('id', id)
 

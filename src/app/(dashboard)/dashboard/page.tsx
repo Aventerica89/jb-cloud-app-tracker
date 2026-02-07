@@ -23,6 +23,11 @@ import {
 } from '@/lib/actions/stats'
 import { statusColors } from '@/lib/design-tokens'
 import type { DeploymentStatus, AppStatus } from '@/types/database'
+import {
+  appStatusColors,
+  deploymentStatusColors,
+  environmentColors,
+} from '@/lib/utils/status-colors'
 
 export default async function DashboardPage() {
   const [stats, recentDeployments, recentApps] = await Promise.all([
