@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Rocket, CheckSquare, FileText } from 'lucide-react'
+import { Rocket, CheckSquare, FileText, Github } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 interface DetailTabsProps {
@@ -10,6 +10,7 @@ interface DetailTabsProps {
   deploymentsContent: ReactNode
   todosContent: ReactNode
   notesContent: ReactNode
+  githubContent?: ReactNode
 }
 
 export function DetailTabs({
@@ -17,6 +18,7 @@ export function DetailTabs({
   deploymentsContent,
   todosContent,
   notesContent,
+  githubContent,
 }: DetailTabsProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -48,6 +50,12 @@ export function DetailTabs({
           <FileText className="h-4 w-4" />
           Notes
         </TabsTrigger>
+        {githubContent && (
+          <TabsTrigger value="github" className="gap-1.5">
+            <Github className="h-4 w-4" />
+            GitHub
+          </TabsTrigger>
+        )}
       </TabsList>
 
       <TabsContent value="deployments" className="mt-4">
@@ -61,6 +69,12 @@ export function DetailTabs({
       <TabsContent value="notes" className="mt-4">
         {notesContent}
       </TabsContent>
+
+      {githubContent && (
+        <TabsContent value="github" className="mt-4">
+          {githubContent}
+        </TabsContent>
+      )}
     </Tabs>
   )
 }

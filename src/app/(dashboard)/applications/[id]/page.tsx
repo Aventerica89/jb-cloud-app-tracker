@@ -42,6 +42,8 @@ import { DetailTabs } from '@/components/applications/detail-tabs'
 import { DeploymentsTab } from '@/components/applications/deployments-tab'
 import { TodosTab } from '@/components/applications/todos-tab'
 import { NotesTab } from '@/components/applications/notes-tab'
+import { GitHubTab } from '@/components/applications/github-tab'
+import { hasGitHubToken } from '@/lib/actions/settings'
 import { appStatusColors } from '@/lib/utils/status-colors'
 import { RelativeTime } from '@/components/ui/relative-time'
 
@@ -81,6 +83,7 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
     { data: initialDeployments, hasMore },
     initialTodos,
     initialNotes,
+    hasGitHub,
   ] = await Promise.all([
     getLatestMaintenanceStatus(id).catch((err) => {
       console.error('Failed to fetch maintenance status:', err)
@@ -106,9 +109,11 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
     getApplicationDeployments(id),
     getTodos(id),
     getNotes(id),
+    hasGitHubToken().catch(() => false),
   ])
 
   const hasGitHubRepo = !!app.github_repo_name
+  const [ghOwner, ghRepo] = app.github_repo_name?.split('/') ?? []
 
   return (
     <div className="flex flex-col h-full">
@@ -256,6 +261,16 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
                 applicationId={app.id}
                 initialNotes={initialNotes}
               />
+            }
+            githubContent={
+              hasGitHubRepo && ghOwner && ghRepo ? (
+                <GitHubTab
+                  applicationId={app.id}
+                  owner={ghOwner}
+                  repo={ghRepo}
+                  hasGitHubToken={hasGitHub}
+                />
+              ) : undefined
             }
           />
         </Suspense>

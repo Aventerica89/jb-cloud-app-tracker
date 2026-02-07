@@ -1,0 +1,5 @@
+export { PullRequestsSection } from './pull-requests-section'
+export { IssuesSection } from './issues-section'
+export { CommitsSection } from './commits-section'
+export { ActionsSection } from './actions-section'
+export { ReleasesSection } from './releases-section'
