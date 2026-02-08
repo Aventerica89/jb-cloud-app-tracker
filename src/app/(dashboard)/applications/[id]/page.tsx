@@ -20,8 +20,6 @@ import {
   ExternalLink,
   GitBranch,
   Globe,
-  Rocket,
-  Terminal,
 } from 'lucide-react'
 import { getApplication, getApplicationDeployments } from '@/lib/actions/applications'
 import { getTodos } from '@/lib/actions/todos'
@@ -29,9 +27,6 @@ import { getNotes } from '@/lib/actions/notes'
 import { ProviderLogo } from '@/components/applications/provider-logo'
 import { DeleteApplicationButton } from '@/components/applications/delete-app-button'
 import { AutoSync } from '@/components/applications/auto-sync'
-import { MaintenanceChecklist } from '@/components/maintenance/maintenance-checklist'
-import { MaintenanceHistory } from '@/components/maintenance/maintenance-history'
-import { AddMaintenanceRunDialog } from '@/components/maintenance/add-maintenance-run-dialog'
 import {
   getLatestMaintenanceStatus,
   getMaintenanceRuns,
@@ -43,6 +38,8 @@ import { DeploymentsTab } from '@/components/applications/deployments-tab'
 import { TodosTab } from '@/components/applications/todos-tab'
 import { NotesTab } from '@/components/applications/notes-tab'
 import { GitHubTab } from '@/components/applications/github-tab'
+import { MaintenanceTab } from '@/components/applications/maintenance-tab'
+import { SessionsTab } from '@/components/applications/sessions-tab'
 import { hasGitHubToken } from '@/lib/actions/settings'
 import { appStatusColors } from '@/lib/utils/status-colors'
 import { RelativeTime } from '@/components/ui/relative-time'
@@ -141,7 +138,8 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
         </div>
       </Header>
 
-      <div className="flex-1 overflow-auto p-6 space-y-6">
+      {/* App metadata - compact section above tabs */}
+      <div className="shrink-0 px-6 py-4 border-b border-border dark:border-orange-500/20 space-y-3">
         {/* Breadcrumb navigation */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -157,8 +155,8 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Status, links, and meta */}
-        <div className="flex flex-wrap items-center gap-4">
+        {/* Status, links, tags, and tech stack - single row */}
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           <Badge variant="outline" className={appStatusColors[app.status]}>
             {app.status}
           </Badge>
@@ -168,9 +166,9 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
               href={app.live_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-primary hover:underline"
+              className="flex items-center gap-1 text-primary hover:underline"
             >
-              <Globe className="h-4 w-4" />
+              <Globe className="h-3.5 w-3.5" />
               {(() => {
                 try { return new URL(app.live_url).hostname } catch { return 'Live' }
               })()}
@@ -183,9 +181,9 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
               href={app.repository_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
             >
-              <GitBranch className="h-4 w-4" />
+              <GitBranch className="h-3.5 w-3.5" />
               Repository
               <ExternalLink className="h-3 w-3" />
             </a>
@@ -193,156 +191,97 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
 
           <RelativeTime
             date={app.updated_at}
-            className="text-sm text-muted-foreground"
+            className="text-muted-foreground"
           />
-        </div>
 
-        {/* Tags - clickable, link to filtered applications */}
-        {app.tags && app.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {app.tags.map((tag) => (
-              <Link key={tag.id} href={`/applications?tags=${tag.id}`}>
-                <Badge
-                  variant="outline"
-                  className="hover:opacity-80 transition-opacity cursor-pointer"
-                  style={{
-                    backgroundColor: `${tag.color}15`,
-                    borderColor: `${tag.color}40`,
-                    color: tag.color,
-                  }}
-                >
-                  {tag.name}
-                </Badge>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Tech Stack */}
-        {app.tech_stack && app.tech_stack.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Tech Stack</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {app.tech_stack.map((tech) => (
-                  <Badge key={tech} variant="secondary">
-                    {tech}
+          {/* Tags */}
+          {app.tags && app.tags.length > 0 && (
+            <>
+              <div className="h-4 w-px bg-border" />
+              {app.tags.map((tag) => (
+                <Link key={tag.id} href={`/applications?tags=${tag.id}`}>
+                  <Badge
+                    variant="outline"
+                    className="hover:opacity-80 transition-opacity cursor-pointer text-xs"
+                    style={{
+                      backgroundColor: `${tag.color}15`,
+                      borderColor: `${tag.color}40`,
+                      color: tag.color,
+                    }}
+                  >
+                    {tag.name}
                   </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                </Link>
+              ))}
+            </>
+          )}
 
-        {/* Tabbed content - deployments/todos/notes */}
-        <Suspense fallback={<TabsSkeleton />}>
-          <DetailTabs
-            appId={app.id}
-            deploymentsContent={
-              <DeploymentsTab
-                applicationId={app.id}
-                initialDeployments={initialDeployments}
-                hasMore={hasMore}
-                hasVercelProject={!!app.vercel_project_id}
-                hasCloudflareProject={!!app.cloudflare_project_name}
-                hasGitHubRepo={hasGitHubRepo}
-              />
-            }
-            todosContent={
-              <TodosTab
-                applicationId={app.id}
-                initialTodos={initialTodos}
-              />
-            }
-            notesContent={
-              <NotesTab
-                applicationId={app.id}
-                initialNotes={initialNotes}
-              />
-            }
-            githubContent={
-              hasGitHubRepo && ghOwner && ghRepo ? (
-                <GitHubTab
-                  applicationId={app.id}
-                  owner={ghOwner}
-                  repo={ghRepo}
-                  hasGitHubToken={hasGitHub}
-                />
-              ) : undefined
-            }
-          />
-        </Suspense>
-
-        {/* Maintenance */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Maintenance</h2>
-          <AddMaintenanceRunDialog
-            applicationId={app.id}
-            commandTypes={commandTypes}
-          />
+          {/* Tech Stack */}
+          {app.tech_stack && app.tech_stack.length > 0 && (
+            <>
+              <div className="h-4 w-px bg-border" />
+              {app.tech_stack.map((tech) => (
+                <Badge key={tech} variant="secondary" className="text-xs">
+                  {tech}
+                </Badge>
+              ))}
+            </>
+          )}
         </div>
-
-        <MaintenanceChecklist
-          applicationId={app.id}
-          statuses={maintenanceStatus}
-        />
-
-        <MaintenanceHistory runs={maintenanceRuns} />
-
-        {/* Sessions */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Claude Sessions</h2>
-          <Link href={`/applications/${app.id}/sessions`}>
-            <Button variant="outline" size="sm">
-              <Terminal className="mr-2 h-4 w-4" />
-              View All Sessions
-            </Button>
-          </Link>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Session Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {sessionStats.total_sessions > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-2xl font-bold">{sessionStats.total_sessions}</p>
-                  <p className="text-sm text-muted-foreground">Sessions</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {sessionStats.total_duration_minutes < 60
-                      ? `${sessionStats.total_duration_minutes}m`
-                      : `${Math.round(sessionStats.total_duration_minutes / 60)}h`}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total Time</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{sessionStats.total_commits}</p>
-                  <p className="text-sm text-muted-foreground">Commits</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {sessionStats.total_tokens >= 1000
-                      ? `${(sessionStats.total_tokens / 1000).toFixed(0)}K`
-                      : sessionStats.total_tokens}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Tokens</p>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No Claude Code sessions recorded yet. Sessions are automatically
-                created when you run <code>/end</code> in Claude Code.
-              </p>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Full-width tabbed navigation - attached right below metadata */}
+      <Suspense fallback={<TabsSkeleton />}>
+        <DetailTabs
+          appId={app.id}
+          deploymentsContent={
+            <DeploymentsTab
+              applicationId={app.id}
+              initialDeployments={initialDeployments}
+              hasMore={hasMore}
+              hasVercelProject={!!app.vercel_project_id}
+              hasCloudflareProject={!!app.cloudflare_project_name}
+              hasGitHubRepo={hasGitHubRepo}
+            />
+          }
+          todosContent={
+            <TodosTab
+              applicationId={app.id}
+              initialTodos={initialTodos}
+            />
+          }
+          notesContent={
+            <NotesTab
+              applicationId={app.id}
+              initialNotes={initialNotes}
+            />
+          }
+          githubContent={
+            hasGitHubRepo && ghOwner && ghRepo ? (
+              <GitHubTab
+                applicationId={app.id}
+                owner={ghOwner}
+                repo={ghRepo}
+                hasGitHubToken={hasGitHub}
+              />
+            ) : undefined
+          }
+          maintenanceContent={
+            <MaintenanceTab
+              applicationId={app.id}
+              statuses={maintenanceStatus}
+              runs={maintenanceRuns}
+              commandTypes={commandTypes}
+            />
+          }
+          sessionsContent={
+            <SessionsTab
+              applicationId={app.id}
+              stats={sessionStats}
+            />
+          }
+        />
+      </Suspense>
     </div>
   )
 }
