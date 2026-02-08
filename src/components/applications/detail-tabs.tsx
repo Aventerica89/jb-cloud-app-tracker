@@ -41,8 +41,8 @@ export function DetailTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="flex-1 flex flex-col">
-      {/* Full-width tab bar attached to header */}
-      <div className="border-b border-border dark:border-orange-500/20">
+      {/* Full-width tab bar with transparent backdrop - matches header */}
+      <div className="shrink-0 border-b border-border dark:border-orange-500/20 backdrop-blur-md bg-card/95 dark:bg-card/90">
         <div className="px-6">
           <TabsList className="h-12 bg-transparent p-0 gap-1">
             <TabsTrigger value="deployments" className="gap-1.5">

@@ -138,111 +138,112 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
         </div>
       </Header>
 
-      {/* App metadata - compact section above tabs */}
-      <div className="shrink-0 px-6 py-4 border-b border-border dark:border-orange-500/20 space-y-3">
-        {/* Breadcrumb navigation */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/applications">Applications</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{app.display_name || app.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        {/* Status, links, tags, and tech stack - single row */}
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          <Badge variant="outline" className={appStatusColors[app.status]}>
-            {app.status}
-          </Badge>
-
-          {app.live_url && (
-            <a
-              href={app.live_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-primary hover:underline"
-            >
-              <Globe className="h-3.5 w-3.5" />
-              {(() => {
-                try { return new URL(app.live_url).hostname } catch { return 'Live' }
-              })()}
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-
-          {app.repository_url && (
-            <a
-              href={app.repository_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
-            >
-              <GitBranch className="h-3.5 w-3.5" />
-              Repository
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-
-          <RelativeTime
-            date={app.updated_at}
-            className="text-muted-foreground"
-          />
-
-          {/* Tags */}
-          {app.tags && app.tags.length > 0 && (
-            <>
-              <div className="h-4 w-px bg-border" />
-              {app.tags.map((tag) => (
-                <Link key={tag.id} href={`/applications?tags=${tag.id}`}>
-                  <Badge
-                    variant="outline"
-                    className="hover:opacity-80 transition-opacity cursor-pointer text-xs"
-                    style={{
-                      backgroundColor: `${tag.color}15`,
-                      borderColor: `${tag.color}40`,
-                      color: tag.color,
-                    }}
-                  >
-                    {tag.name}
-                  </Badge>
-                </Link>
-              ))}
-            </>
-          )}
-
-          {/* Tech Stack */}
-          {app.tech_stack && app.tech_stack.length > 0 && (
-            <>
-              <div className="h-4 w-px bg-border" />
-              {app.tech_stack.map((tech) => (
-                <Badge key={tech} variant="secondary" className="text-xs">
-                  {tech}
-                </Badge>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Full-width tabbed navigation - attached right below metadata */}
+      {/* Full-width tabbed navigation - attached right below header */}
       <Suspense fallback={<TabsSkeleton />}>
         <DetailTabs
           appId={app.id}
           deploymentsContent={
-            <DeploymentsTab
+            <>
+              {/* App metadata at top of deployments tab */}
+              <div className="mb-6 space-y-3">
+                {/* Breadcrumb navigation */}
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link href="/applications">Applications</Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{app.display_name || app.name}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+
+                {/* Status, links, tags, and tech stack - single row */}
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <Badge variant="outline" className={appStatusColors[app.status]}>
+                    {app.status}
+                  </Badge>
+
+                  {app.live_url && (
+                    <a
+                      href={app.live_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-primary hover:underline"
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+                      {(() => {
+                        try { return new URL(app.live_url).hostname } catch { return 'Live' }
+                      })()}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+
+                  {app.repository_url && (
+                    <a
+                      href={app.repository_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <GitBranch className="h-3.5 w-3.5" />
+                      Repository
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+
+                  <RelativeTime
+                    date={app.updated_at}
+                    className="text-muted-foreground"
+                  />
+
+                  {/* Tags */}
+                  {app.tags && app.tags.length > 0 && (
+                    <>
+                      <div className="h-4 w-px bg-border" />
+                      {app.tags.map((tag) => (
+                        <Link key={tag.id} href={`/applications?tags=${tag.id}`}>
+                          <Badge
+                            variant="outline"
+                            className="hover:opacity-80 transition-opacity cursor-pointer text-xs"
+                            style={{
+                              backgroundColor: `${tag.color}15`,
+                              borderColor: `${tag.color}40`,
+                              color: tag.color,
+                            }}
+                          >
+                            {tag.name}
+                          </Badge>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Tech Stack */}
+                  {app.tech_stack && app.tech_stack.length > 0 && (
+                    <>
+                      <div className="h-4 w-px bg-border" />
+                      {app.tech_stack.map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </>
+                  )}
+                </div>
+              </div>
+              <DeploymentsTab
               applicationId={app.id}
               initialDeployments={initialDeployments}
               hasMore={hasMore}
               hasVercelProject={!!app.vercel_project_id}
-              hasCloudflareProject={!!app.cloudflare_project_name}
-              hasGitHubRepo={hasGitHubRepo}
-            />
+                hasCloudflareProject={!!app.cloudflare_project_name}
+                hasGitHubRepo={hasGitHubRepo}
+              />
+            </>
           }
           todosContent={
             <TodosTab
