@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('applications')
-      .select('id, name, display_name, status, tech_stack, live_url, repository_url')
+      .select('id, name, status, tech_stack, live_url, repository_url')
       .order('name', { ascending: true })
 
     if (error) {
