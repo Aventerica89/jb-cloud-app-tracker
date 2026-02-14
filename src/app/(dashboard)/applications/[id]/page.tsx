@@ -118,6 +118,7 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pr
         applicationId={app.id}
         hasVercelProject={!!app.vercel_project_id}
         hasCloudflareProject={!!app.cloudflare_project_name}
+        hasCloudflareWorker={!!app.cloudflare_worker_name}
         hasGitHubRepo={hasGitHubRepo}
       />
       <Header title={app.display_name || app.name} description={app.description || undefined}>

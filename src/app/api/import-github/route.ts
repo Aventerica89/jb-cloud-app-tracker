@@ -72,6 +72,10 @@ const HARDCODED_VERCEL: VercelLookup = {
   },
 }
 
+const HARDCODED_CLOUDFLARE_WORKERS: Record<string, string> = {
+  vaporforge: 'vaporforge',
+}
+
 const HARDCODED_CLOUDFLARE: CloudflareLookup = {
   'jb-cloud-docs': {
     projectName: 'jb-cloud-docs',
@@ -531,6 +535,8 @@ export async function POST(request: Request) {
             vercel_project_id: vercelProject?.projectId || null,
             cloudflare_project_name:
               cloudflareProject?.projectName || null,
+            cloudflare_worker_name:
+              HARDCODED_CLOUDFLARE_WORKERS[repo.name] || null,
           })
           .select('id')
           .single()

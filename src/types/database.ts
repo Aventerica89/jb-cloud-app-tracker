@@ -48,6 +48,7 @@ export interface Application {
   status: AppStatus
   vercel_project_id: string | null
   cloudflare_project_name: string | null
+  cloudflare_worker_name: string | null
   github_repo_name: string | null
   created_at: string
   updated_at: string
@@ -188,6 +189,7 @@ export interface CreateApplicationInput {
   tag_ids?: string[]
   vercel_project_id?: string
   cloudflare_project_name?: string
+  cloudflare_worker_name?: string
   github_repo_name?: string
 }
 
@@ -202,6 +204,7 @@ export interface UpdateApplicationInput {
   tag_ids?: string[]
   vercel_project_id?: string
   cloudflare_project_name?: string
+  cloudflare_worker_name?: string
   github_repo_name?: string
 }
 
@@ -312,6 +315,14 @@ export interface CloudflareDeployment {
     name: string
     status: 'active' | 'idle' | 'canceled' | 'failure' | 'success'
   }
+  created_on: string
+}
+
+// Cloudflare Workers API types
+export interface CloudflareWorkerVersion {
+  id: string
+  number: number
+  metadata: Record<string, unknown>
   created_on: string
 }
 

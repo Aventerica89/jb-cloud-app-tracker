@@ -5,9 +5,16 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { ActionResult } from '@/types/actions'
 
+interface CloudflareWorkerInfo {
+  scriptName: string
+}
+
+type CloudflareWorkerLookup = Record<string, CloudflareWorkerInfo>
+
 interface AutoConnectResult {
   vercel: string[]
   cloudflare: string[]
+  workers: string[]
   github: string[]
   alreadyConnected: number
   noRepoUrl: number
@@ -188,6 +195,49 @@ async function buildCloudflareLookup(
   }
 }
 
+async function buildCloudflareWorkerLookup(
+  token: string,
+  accountId: string
+): Promise<CloudflareWorkerLookup> {
+  if (!CF_ACCOUNT_ID_RE.test(accountId)) {
+    return {}
+  }
+
+  try {
+    const response = await fetch(
+      `${CLOUDFLARE_API_BASE}/accounts/${accountId}/workers/scripts`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (!response.ok) {
+      console.error('Cloudflare Workers API error:', response.status)
+      return {}
+    }
+
+    const data = await response.json()
+    const scripts: Array<{ id: string; script?: string }> = data.result || []
+
+    const lookup: CloudflareWorkerLookup = {}
+    for (const script of scripts) {
+      const name = script.id
+      lookup[name] = { scriptName: name }
+    }
+
+    return lookup
+  } catch (err) {
+    console.error(
+      'Failed to fetch Cloudflare Workers:',
+      err instanceof Error ? err.message : 'Unknown error'
+    )
+    return {}
+  }
+}
+
 export async function autoConnectProviders(): Promise<
   ActionResult<AutoConnectResult>
 > {
@@ -215,7 +265,7 @@ export async function autoConnectProviders(): Promise<
   const { data: apps } = await supabase
     .from('applications')
     .select(
-      'id, name, repository_url, vercel_project_id, cloudflare_project_name, github_repo_name, live_url'
+      'id, name, repository_url, vercel_project_id, cloudflare_project_name, cloudflare_worker_name, github_repo_name, live_url'
     )
     .eq('user_id', user.id)
 
@@ -223,7 +273,7 @@ export async function autoConnectProviders(): Promise<
     return { success: false, error: 'No applications found' }
   }
 
-  const [vercelMap, cloudflareMap] = await Promise.all([
+  const [vercelMap, cloudflareMap, workerMap] = await Promise.all([
     hasVercel && settings?.vercel_token
       ? buildVercelLookup(settings.vercel_token, settings.vercel_team_id)
       : Promise.resolve({} as VercelLookup),
@@ -233,10 +283,17 @@ export async function autoConnectProviders(): Promise<
           settings.cloudflare_account_id
         )
       : Promise.resolve({} as CloudflareLookup),
+    hasCloudflare && settings?.cloudflare_token && settings?.cloudflare_account_id
+      ? buildCloudflareWorkerLookup(
+          settings.cloudflare_token,
+          settings.cloudflare_account_id
+        )
+      : Promise.resolve({} as CloudflareWorkerLookup),
   ])
 
   const vercelConnected: string[] = []
   const cloudflareConnected: string[] = []
+  const workersConnected: string[] = []
   const githubConnected: string[] = []
   let alreadyConnected = 0
   let noRepoUrl = 0
@@ -280,6 +337,13 @@ export async function autoConnectProviders(): Promise<
       cloudflareConnected.push(app.name)
     }
 
+    const workerMatch = workerMap[repoName]
+    if (workerMatch && !app.cloudflare_worker_name) {
+      updates.cloudflare_worker_name = workerMatch.scriptName
+      connected = true
+      workersConnected.push(app.name)
+    }
+
     if (!app.github_repo_name && app.repository_url?.includes('github.com')) {
       const ownerRepo = extractOwnerRepo(app.repository_url)
       if (ownerRepo) {
@@ -305,6 +369,7 @@ export async function autoConnectProviders(): Promise<
   const result: AutoConnectResult = {
     vercel: vercelConnected,
     cloudflare: cloudflareConnected,
+    workers: workersConnected,
     github: githubConnected,
     alreadyConnected,
     noRepoUrl,

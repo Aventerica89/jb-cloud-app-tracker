@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { CloudflareProject, CloudflareDeployment } from '@/types/database'
+import type { CloudflareProject, CloudflareDeployment, CloudflareWorkerVersion } from '@/types/database'
 
 const CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4'
 
@@ -72,6 +72,32 @@ export async function getCloudflareDeployments(
 
   const result = await cloudflareRequest<CloudflareDeployment[]>(
     `/accounts/${credentials.accountId}/pages/projects/${projectName}/deployments`,
+    credentials
+  )
+
+  return result || []
+}
+
+export async function getCloudflareWorkers(): Promise<Array<{ id: string; script: string }>> {
+  const credentials = await getCloudflareCredentials()
+  if (!credentials) return []
+
+  const result = await cloudflareRequest<Array<{ id: string; script: string }>>(
+    `/accounts/${credentials.accountId}/workers/scripts`,
+    credentials
+  )
+
+  return result || []
+}
+
+export async function getCloudflareWorkerVersions(
+  scriptName: string
+): Promise<CloudflareWorkerVersion[]> {
+  const credentials = await getCloudflareCredentials()
+  if (!credentials) return []
+
+  const result = await cloudflareRequest<CloudflareWorkerVersion[]>(
+    `/accounts/${credentials.accountId}/workers/scripts/${scriptName}/versions`,
     credentials
   )
 

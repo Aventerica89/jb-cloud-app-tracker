@@ -18,6 +18,7 @@ import { autoConnectProviders } from '@/lib/actions/auto-connect'
 interface ConnectResult {
   vercel: string[]
   cloudflare: string[]
+  workers: string[]
   github: string[]
   alreadyConnected: number
   noRepoUrl: number
@@ -46,7 +47,7 @@ export function AutoConnectButton() {
       const data = response.data!
       setResult(data)
 
-      const totalConnected = data.vercel.length + data.cloudflare.length + data.github.length
+      const totalConnected = data.vercel.length + data.cloudflare.length + data.workers.length + data.github.length
       if (totalConnected > 0) {
         toast.success(`Connected ${totalConnected} applications`)
         router.refresh()
@@ -70,7 +71,7 @@ export function AutoConnectButton() {
   }
 
   const totalConnected = result
-    ? result.vercel.length + result.cloudflare.length + result.github.length
+    ? result.vercel.length + result.cloudflare.length + result.workers.length + result.github.length
     : 0
 
   return (
@@ -151,6 +152,20 @@ export function AutoConnectButton() {
                   </p>
                   <ul className="mt-1 text-xs text-muted-foreground list-disc list-inside">
                     {result.cloudflare.map((name) => (
+                      <li key={name}>{name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {result.workers.length > 0 && (
+                <div className="rounded-md bg-green-500/10 p-3">
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4" />
+                    CF Workers ({result.workers.length})
+                  </p>
+                  <ul className="mt-1 text-xs text-muted-foreground list-disc list-inside">
+                    {result.workers.map((name) => (
                       <li key={name}>{name}</li>
                     ))}
                   </ul>

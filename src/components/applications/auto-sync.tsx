@@ -2,12 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { syncVercelDeployments, syncCloudflareDeployments, syncGitHubDeployments } from '@/lib/actions/sync'
+import { syncVercelDeployments, syncCloudflareDeployments, syncCloudflareWorkerDeployments, syncGitHubDeployments } from '@/lib/actions/sync'
 
 interface AutoSyncProps {
   applicationId: string
   hasVercelProject: boolean
   hasCloudflareProject: boolean
+  hasCloudflareWorker?: boolean
   hasGitHubRepo?: boolean
 }
 
@@ -15,6 +16,7 @@ export function AutoSync({
   applicationId,
   hasVercelProject,
   hasCloudflareProject,
+  hasCloudflareWorker = false,
   hasGitHubRepo = false,
 }: AutoSyncProps) {
   const router = useRouter()
@@ -22,7 +24,7 @@ export function AutoSync({
 
   useEffect(() => {
     if (hasSynced.current) return
-    if (!hasVercelProject && !hasCloudflareProject && !hasGitHubRepo) return
+    if (!hasVercelProject && !hasCloudflareProject && !hasCloudflareWorker && !hasGitHubRepo) return
 
     hasSynced.current = true
 
@@ -37,6 +39,10 @@ export function AutoSync({
         promises.push(syncCloudflareDeployments(applicationId))
       }
 
+      if (hasCloudflareWorker) {
+        promises.push(syncCloudflareWorkerDeployments(applicationId))
+      }
+
       if (hasGitHubRepo) {
         promises.push(syncGitHubDeployments(applicationId))
       }
@@ -49,7 +55,7 @@ export function AutoSync({
 
     const timeout = setTimeout(autoSync, 500)
     return () => clearTimeout(timeout)
-  }, [applicationId, hasVercelProject, hasCloudflareProject, hasGitHubRepo, router])
+  }, [applicationId, hasVercelProject, hasCloudflareProject, hasCloudflareWorker, hasGitHubRepo, router])
 
   return null
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getVercelDeployments } from './vercel'
-import { getCloudflareDeployments } from './cloudflare'
+import { getCloudflareDeployments, getCloudflareWorkerVersions } from './cloudflare'
 import { getGitHubDeployments } from './github'
 import { mapGitHubStatus, mapGitHubEnvironment } from '@/lib/utils/github-mappers'
 import { getEnvironments } from './environments'
@@ -288,6 +288,115 @@ export async function syncCloudflareDeployments(
     success: true,
     data: {
       synced: cloudflareDeployments.length,
+      created,
+      updated,
+    },
+  }
+}
+
+export async function syncCloudflareWorkerDeployments(
+  applicationId: string
+): Promise<ActionResult<{ synced: number; created: number; updated: number }>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  const { data: app, error: appError } = await supabase
+    .from('applications')
+    .select('id, cloudflare_worker_name, user_id')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (appError || !app) {
+    return { success: false, error: 'Application not found' }
+  }
+
+  if (!app.cloudflare_worker_name) {
+    return { success: false, error: 'No Cloudflare Worker linked to this application' }
+  }
+
+  const { data: cloudflareProvider, error: providerError } = await supabase
+    .from('cloud_providers')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('slug', 'cloudflare')
+    .single()
+
+  if (providerError || !cloudflareProvider) {
+    return { success: false, error: 'Cloudflare provider not found' }
+  }
+
+  const environments = await getEnvironments()
+  const productionEnv = environments.find((e) => e.slug === 'production')
+
+  if (!productionEnv) {
+    return { success: false, error: 'Production environment not found' }
+  }
+
+  const workerVersions = await getCloudflareWorkerVersions(app.cloudflare_worker_name)
+
+  if (workerVersions.length === 0) {
+    return {
+      success: true,
+      data: { synced: 0, created: 0, updated: 0 },
+    }
+  }
+
+  let created = 0
+  let updated = 0
+
+  for (const version of workerVersions) {
+    const externalId = `cf-worker:${version.id}`
+    const deployedAt = new Date(version.created_on).toISOString()
+
+    const { data: existing } = await supabase
+      .from('deployments')
+      .select('id, status')
+      .eq('application_id', applicationId)
+      .eq('external_id', externalId)
+      .single()
+
+    if (existing) {
+      if (existing.status !== 'deployed') {
+        await supabase
+          .from('deployments')
+          .update({ status: 'deployed' as DeploymentStatus })
+          .eq('id', existing.id)
+        updated++
+      }
+    } else {
+      const { error: insertError } = await supabase.from('deployments').insert({
+        application_id: applicationId,
+        provider_id: cloudflareProvider.id,
+        environment_id: productionEnv.id,
+        external_id: externalId,
+        url: null,
+        branch: null,
+        commit_sha: null,
+        status: 'deployed' as DeploymentStatus,
+        deployed_at: deployedAt,
+      })
+
+      if (!insertError) {
+        created++
+      }
+    }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/deployments')
+  revalidatePath(`/applications/${applicationId}`)
+
+  return {
+    success: true,
+    data: {
+      synced: workerVersions.length,
       created,
       updated,
     },

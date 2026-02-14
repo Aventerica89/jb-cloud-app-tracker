@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RefreshCw } from 'lucide-react'
-import { syncVercelDeployments, syncCloudflareDeployments, syncGitHubDeployments } from '@/lib/actions/sync'
+import { syncVercelDeployments, syncCloudflareDeployments, syncCloudflareWorkerDeployments, syncGitHubDeployments } from '@/lib/actions/sync'
 import { getApplications } from '@/lib/actions/applications'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -38,6 +38,15 @@ export function SyncAllButton() {
         if (app.cloudflare_project_name) {
           promises.push(
             syncCloudflareDeployments(app.id)
+              .then((r) => {
+                if (r.success && r.data) totalSynced += r.data.synced
+              })
+              .catch(() => { totalFailed++ })
+          )
+        }
+        if (app.cloudflare_worker_name) {
+          promises.push(
+            syncCloudflareWorkerDeployments(app.id)
               .then((r) => {
                 if (r.success && r.data) totalSynced += r.data.synced
               })
