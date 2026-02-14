@@ -46,6 +46,30 @@ const HARDCODED_VERCEL: VercelLookup = {
     projectId: 'prj_Hg3zIym5rLLRvCPfE5MExwRZ0AIm',
     liveUrl: 'https://astra.agency',
   },
+  'claude-codex': {
+    projectId: 'prj_5WaTRYRMt2EBBUkFbrJaqPdsK8dR',
+    liveUrl: 'https://codex.jbcloud.app',
+  },
+  'renvio-companion-app': {
+    projectId: 'prj_Br3FGr3jTjwHlnGauJ6iG0tDG7dN',
+    liveUrl: 'https://renvio.jbcloud.app',
+  },
+  'hd-flowsheet-cloud': {
+    projectId: 'prj_WZuCGGgL9j4X9Z6XcqlseGLxVqAb',
+    liveUrl: '',
+  },
+  'bricks-cc': {
+    projectId: 'prj_RHT3Eme1oxIfNT2uAUNsHKGANouw',
+    liveUrl: '',
+  },
+  'personal-apps': {
+    projectId: 'prj_YMac41OzH10jI58JbAsFmOG2Mn3i',
+    liveUrl: '',
+  },
+  hdflowsheet: {
+    projectId: 'prj_vNxyIOQseYmEjRkNXMarCQEzt9m1',
+    liveUrl: '',
+  },
 }
 
 const HARDCODED_CLOUDFLARE: CloudflareLookup = {
@@ -503,6 +527,7 @@ export async function POST(request: Request) {
             live_url: liveUrl,
             tech_stack: techStack,
             status: 'active',
+            github_repo_name: `${username}/${repo.name}`,
             vercel_project_id: vercelProject?.projectId || null,
             cloudflare_project_name:
               cloudflareProject?.projectName || null,

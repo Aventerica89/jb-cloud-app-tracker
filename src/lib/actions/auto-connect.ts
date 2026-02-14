@@ -8,6 +8,7 @@ import type { ActionResult } from '@/types/actions'
 interface AutoConnectResult {
   vercel: string[]
   cloudflare: string[]
+  github: string[]
   alreadyConnected: number
   noRepoUrl: number
 }
@@ -58,6 +59,16 @@ function extractRepoName(url: string): string | null {
     const pathname = new URL(url).pathname
     const segments = pathname.split('/').filter(Boolean)
     return segments.length >= 2 ? segments[segments.length - 1] : null
+  } catch {
+    return null
+  }
+}
+
+function extractOwnerRepo(url: string): string | null {
+  try {
+    const pathname = new URL(url).pathname
+    const segments = pathname.split('/').filter(Boolean)
+    return segments.length >= 2 ? `${segments[0]}/${segments[1]}` : null
   } catch {
     return null
   }
@@ -201,17 +212,10 @@ export async function autoConnectProviders(): Promise<
   const hasCloudflare =
     !!settings?.cloudflare_token && !!settings?.cloudflare_account_id
 
-  if (!hasVercel && !hasCloudflare) {
-    return {
-      success: false,
-      error: 'Configure API tokens in Settings first',
-    }
-  }
-
   const { data: apps } = await supabase
     .from('applications')
     .select(
-      'id, name, repository_url, vercel_project_id, cloudflare_project_name, live_url'
+      'id, name, repository_url, vercel_project_id, cloudflare_project_name, github_repo_name, live_url'
     )
     .eq('user_id', user.id)
 
@@ -233,6 +237,7 @@ export async function autoConnectProviders(): Promise<
 
   const vercelConnected: string[] = []
   const cloudflareConnected: string[] = []
+  const githubConnected: string[] = []
   let alreadyConnected = 0
   let noRepoUrl = 0
   const pendingUpdates: Array<{ id: string; updates: Record<string, string> }> = []
@@ -275,6 +280,15 @@ export async function autoConnectProviders(): Promise<
       cloudflareConnected.push(app.name)
     }
 
+    if (!app.github_repo_name && app.repository_url?.includes('github.com')) {
+      const ownerRepo = extractOwnerRepo(app.repository_url)
+      if (ownerRepo) {
+        updates.github_repo_name = ownerRepo
+        connected = true
+        githubConnected.push(app.name)
+      }
+    }
+
     if (connected) {
       pendingUpdates.push({ id: app.id, updates })
     } else if (hasExistingConnection) {
@@ -291,6 +305,7 @@ export async function autoConnectProviders(): Promise<
   const result: AutoConnectResult = {
     vercel: vercelConnected,
     cloudflare: cloudflareConnected,
+    github: githubConnected,
     alreadyConnected,
     noRepoUrl,
   }
