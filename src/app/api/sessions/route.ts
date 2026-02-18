@@ -56,6 +56,17 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
 
+    // Verify application exists before returning its sessions
+    const { data: app, error: appError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('id', applicationId)
+      .single()
+
+    if (appError || !app) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 })
+    }
+
     const { data, error } = await supabase
       .from('claude_sessions')
       .select('*')
@@ -193,15 +204,26 @@ export async function PATCH(request: NextRequest) {
 
     const supabase = getSupabaseAdmin()
 
-    // Get current session to calculate duration
+    // Get current session to calculate duration and verify it exists
     const { data: existing, error: fetchError } = await supabase
       .from('claude_sessions')
-      .select('started_at')
+      .select('started_at, application_id')
       .eq('id', body.id)
       .single()
 
     if (fetchError || !existing) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    // Verify the session's application exists
+    const { data: app, error: appError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('id', existing.application_id)
+      .single()
+
+    if (appError || !app) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 })
     }
 
     // Calculate duration if ending the session
