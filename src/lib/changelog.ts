@@ -9,6 +9,19 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.5.0',
+    date: '2026-02-18',
+    changes: [
+      { type: 'added', description: 'Right-click context menu on all application cards (grid, list, compact)' },
+      { type: 'added', description: 'Display name field for applications (shown on cards instead of app name)' },
+      { type: 'added', description: 'Animated grid pattern background on applications page' },
+      { type: 'added', description: 'Floating dock with quick actions (add, sync, import, view toggle)' },
+      { type: 'added', description: 'Smooth fade transitions when switching between grid, list, and compact views' },
+      { type: 'added', description: 'GitHub as a cloud provider with deployment sync support' },
+      { type: 'fixed', description: 'GitHub sync now works (provider was missing from database)' },
+    ],
+  },
+  {
     version: '1.4.0',
     date: '2026-02-05',
     changes: [
