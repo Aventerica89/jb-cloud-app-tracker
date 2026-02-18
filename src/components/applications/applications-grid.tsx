@@ -4,6 +4,7 @@ import { useGridDensity } from '@/hooks/use-grid-density'
 import { GridDensityToggle } from '@/components/ui/grid-density-toggle'
 import { GridContainer } from '@/components/ui/grid-container'
 import { AppCard } from '@/components/applications/app-card'
+import { AppContextMenu } from '@/components/applications/app-context-menu'
 import type { ApplicationWithRelations } from '@/types/database'
 
 interface ApplicationsGridProps {
@@ -20,7 +21,9 @@ export function ApplicationsGrid({ applications }: ApplicationsGridProps) {
       </div>
       <GridContainer density={density}>
         {applications.map((app) => (
-          <AppCard key={app.id} app={app} />
+          <AppContextMenu key={app.id} app={app}>
+            <AppCard app={app} />
+          </AppContextMenu>
         ))}
       </GridContainer>
     </>

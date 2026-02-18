@@ -17,6 +17,10 @@ import { SyncAllButton } from '@/components/applications/sync-all-button'
 import { GitHubImportButton } from '@/components/applications/github-import-button'
 import { AutoConnectButton } from '@/components/applications/auto-connect-button'
 import { ApplicationsGrid } from '@/components/applications/applications-grid'
+import { AppContextMenu } from '@/components/applications/app-context-menu'
+import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern'
+import { AppDock } from '@/components/applications/app-dock'
+import { AnimatedViewWrapper } from '@/components/applications/animated-view-wrapper'
 
 interface Props {
   searchParams: Promise<{ search?: string; status?: string; view?: string; tags?: string }>
@@ -57,25 +61,37 @@ async function ApplicationsList({
 
   if (view === 'list') {
     return (
-      <div className="flex flex-col gap-2">
-        {applications.map((app) => (
-          <AppListItem key={app.id} app={app} />
-        ))}
-      </div>
+      <AnimatedViewWrapper viewKey="list">
+        <div className="flex flex-col gap-2">
+          {applications.map((app) => (
+            <AppContextMenu key={app.id} app={app}>
+              <AppListItem app={app} />
+            </AppContextMenu>
+          ))}
+        </div>
+      </AnimatedViewWrapper>
     )
   }
 
   if (view === 'compact') {
     return (
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {applications.map((app) => (
-          <AppCompactCard key={app.id} app={app} />
-        ))}
-      </div>
+      <AnimatedViewWrapper viewKey="compact">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {applications.map((app) => (
+            <AppContextMenu key={app.id} app={app}>
+              <AppCompactCard app={app} />
+            </AppContextMenu>
+          ))}
+        </div>
+      </AnimatedViewWrapper>
     )
   }
 
-  return <ApplicationsGrid applications={applications} />
+  return (
+    <AnimatedViewWrapper viewKey="grid">
+      <ApplicationsGrid applications={applications} />
+    </AnimatedViewWrapper>
+  )
 }
 
 async function TagFilterBarWrapper() {
@@ -107,7 +123,14 @@ export default async function ApplicationsPage({ searchParams }: Props) {
         </div>
       </Header>
 
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 relative">
+        <AnimatedGridPattern
+          numSquares={30}
+          maxOpacity={0.1}
+          duration={3}
+          repeatDelay={1}
+          className="absolute inset-0 -z-10 h-full w-full [mask-image:radial-gradient(500px_circle_at_center,white,transparent)]"
+        />
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
           <div className="flex-1">
             <Suspense fallback={null}>
@@ -132,6 +155,8 @@ export default async function ApplicationsPage({ searchParams }: Props) {
           />
         </Suspense>
       </div>
+
+      <AppDock />
     </div>
   )
 }

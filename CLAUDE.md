@@ -113,7 +113,7 @@ maintenance_command_types (shared reference data)
 
 **environments** (shared)
 - Reference data: Development, Staging, Production
-- No RLS - read-only for all users
+- RLS enabled with service role full access policy (fixed 2026-02-18)
 
 **tags**
 - User-owned labels with colors
@@ -158,6 +158,10 @@ Located in `supabase/migrations/`:
 5. `005_create_maintenance_tables.sql` - Maintenance tracking
 6. `006_enable_rls_maintenance_command_types.sql` - RLS policies
 7. `007_create_sessions_table.sql` - Claude sessions tracking
+8. `008_add_display_name.sql` - Display name field for applications
+9. `009_cloudflare_worker_name.sql` - Cloudflare worker name column
+10. `010_enable_rls_environments.sql` - Enable RLS on environments table
+11. `011_add_github_provider.sql` - Add GitHub as cloud provider + update seed trigger
 
 ## Key Patterns
 

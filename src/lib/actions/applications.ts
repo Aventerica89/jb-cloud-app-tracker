@@ -167,6 +167,7 @@ export async function createApplication(
 
   const rawData = {
     name: formData.get('name'),
+    display_name: formData.get('display_name') || undefined,
     description: formData.get('description') || undefined,
     repository_url: formData.get('repository_url') || undefined,
     live_url: formData.get('live_url') || undefined,
@@ -196,13 +197,14 @@ export async function createApplication(
     }
   }
 
-  const { tag_ids, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...applicationData } = parsed.data
+  const { tag_ids, display_name, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...applicationData } = parsed.data
 
   const { data, error } = await supabase
     .from('applications')
     .insert({
       ...applicationData,
       user_id: user.id,
+      display_name: display_name || null,
       live_url: live_url || null,
       vercel_project_id: vercel_project_id || null,
       cloudflare_project_name: cloudflare_project_name || null,
@@ -251,6 +253,7 @@ export async function updateApplication(
   const rawData = {
     id: formData.get('id'),
     name: formData.get('name') || undefined,
+    display_name: formData.get('display_name'),
     description: formData.get('description'),
     repository_url: formData.get('repository_url'),
     live_url: formData.get('live_url'),
@@ -280,12 +283,13 @@ export async function updateApplication(
     }
   }
 
-  const { id, tag_ids, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...updateData } = parsed.data
+  const { id, tag_ids, display_name, vercel_project_id, cloudflare_project_name, github_repo_name, live_url, ...updateData } = parsed.data
 
   const { error } = await supabase
     .from('applications')
     .update({
       ...updateData,
+      display_name: display_name === '' ? null : display_name,
       live_url: live_url === '' ? null : live_url,
       vercel_project_id: vercel_project_id === '' ? null : vercel_project_id,
       cloudflare_project_name: cloudflare_project_name === '' ? null : cloudflare_project_name,

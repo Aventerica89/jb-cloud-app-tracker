@@ -4,6 +4,7 @@ export const appStatusSchema = z.enum(['active', 'inactive', 'archived', 'mainte
 
 export const createApplicationSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
+  display_name: z.string().max(100).optional().or(z.literal('')),
   description: z.string().max(500).optional(),
   repository_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   live_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
@@ -18,6 +19,7 @@ export const createApplicationSchema = z.object({
 export const updateApplicationSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, 'Name is required').max(100).optional(),
+  display_name: z.string().max(100).optional().or(z.literal('')).nullable(),
   description: z.string().max(500).optional().nullable(),
   repository_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable(),
   live_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable(),

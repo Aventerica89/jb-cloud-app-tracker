@@ -107,6 +107,20 @@ export function ApplicationForm({ application, tags, hasVercelToken = false, has
       </div>
 
       <div className="grid gap-2">
+        <Label htmlFor="display_name">Display Name</Label>
+        <Input
+          id="display_name"
+          name="display_name"
+          placeholder="Optional friendly name"
+          maxLength={100}
+          defaultValue={application?.display_name || ''}
+        />
+        <p className="text-xs text-muted-foreground">
+          Shown on cards instead of the app name
+        </p>
+      </div>
+
+      <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
