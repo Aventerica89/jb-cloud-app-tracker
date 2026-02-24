@@ -1,0 +1,64 @@
+{ "v": "0.0.0", "ts": "2026-01-26T22:51:28-07:00", "msg": "init project with architecture and implementation plan", "hash": "1ca7ebf" }
+{ "v": "0.0.0", "ts": "2026-01-26T23:04:11-07:00", "msg": "initialize Next.js 15 project", "hash": "9de1211" }
+{ "v": "0.0.0", "ts": "2026-01-26T23:19:13-07:00", "msg": "add Phase 1 foundation: auth and layout", "hash": "1e6610f" }
+{ "v": "0.0.0", "ts": "2026-01-26T23:40:18-07:00", "msg": "fix tw-animate-css import causing build errors", "hash": "51cfb92" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:16:03-07:00", "msg": "add database migrations with RLS and provider seeding", "hash": "03f45d8" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:24:43-07:00", "msg": "fix hydration mismatch in theme toggle", "hash": "2949455" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:34:00-07:00", "msg": "add Phase 2: Core Data Management", "hash": "4baae87" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:39:28-07:00", "msg": "add Phase 3: Deployments", "hash": "2645ad5" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:41:25-07:00", "msg": "add Phase 4: Dashboard", "hash": "0efb58a" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:43:14-07:00", "msg": "add Phase 5: Polish", "hash": "d109408" }
+{ "v": "0.0.0", "ts": "2026-01-27T00:43:49-07:00", "msg": "update implementation status for completed phases", "hash": "2f8a48d" }
+{ "v": "0.0.0", "ts": "2026-01-27T17:10:10-07:00", "msg": "add Phase 6: Testing infrastructure", "hash": "5da36bc" }
+{ "v": "0.0.0", "ts": "2026-01-27T17:10:54-07:00", "msg": "add deployment instructions, mark all phases complete", "hash": "a83a340" }
+{ "v": "0.0.0", "ts": "2026-01-28T00:45:37-07:00", "msg": "add Vercel API integration for deployment sync", "hash": "1fc57a0" }
+{ "v": "0.0.0", "ts": "2026-01-28T02:23:33-07:00", "msg": "add Cloudflare integration, auto-sync, security", "hash": "0c0e690" }
+{ "v": "0.0.0", "ts": "2026-01-28T02:25:11-07:00", "msg": "fix seed_user_providers trigger security context", "hash": "21fbfda" }
+{ "v": "0.0.0", "ts": "2026-01-28T03:50:18-07:00", "msg": "add forgot password and reset password flow", "hash": "e9ea3e3" }
+{ "v": "0.0.0", "ts": "2026-01-28T11:50:53-07:00", "msg": "add Google OAuth sign-in", "hash": "41ebb6b" }
+{ "v": "0.0.0", "ts": "2026-01-28T12:08:50-07:00", "msg": "add Supabase config with Google OAuth", "hash": "87454bf" }
+{ "v": "0.0.0", "ts": "2026-01-28T13:12:40-07:00", "msg": "fix callback route cookie handling for OAuth", "hash": "813672f" }
+{ "v": "0.0.0", "ts": "2026-01-28T13:20:37-07:00", "msg": "fix Google OAuth to use route handler", "hash": "a15f5d7" }
+{ "v": "0.0.0", "ts": "2026-01-28T14:42:56-07:00", "msg": "fix remove onClick handler from server component", "hash": "71eecf5" }
+{ "v": "0.0.0", "ts": "2026-01-28T15:57:08-07:00", "msg": "add GitHub import with AI descriptions and live URLs", "hash": "b445d6a" }
+{ "v": "0.0.0", "ts": "2026-01-28T16:20:43-07:00", "msg": "fix TypeScript null check in getOrCreateTag", "hash": "31f1688" }
+{ "v": "0.0.0", "ts": "2026-01-28T23:53:15-07:00", "msg": "add maintenance command scheduling system", "hash": "e67f3e4" }
+{ "v": "0.0.0", "ts": "2026-01-29T00:10:33-07:00", "msg": "fix add date-fns dependency", "hash": "f12f26a" }
+{ "v": "0.0.0", "ts": "2026-01-29T03:04:48-07:00", "msg": "add animated wave background and infra improvements", "hash": "eff88ea" }
+{ "v": "0.0.0", "ts": "2026-01-29T08:01:38-07:00", "msg": "add mobile app support with PWA configuration", "hash": "55dfc7b" }
+{ "v": "0.0.0", "ts": "2026-01-29T11:42:33-07:00", "msg": "setup mobile app enhancements", "hash": "184fbe7" }
+{ "v": "0.0.0", "ts": "2026-01-29T12:41:32-07:00", "msg": "setup mobile app improvements", "hash": "67e328d" }
+{ "v": "0.0.0", "ts": "2026-01-30T15:05:38-07:00", "msg": "enhance dark mode styling and dashboard UI", "hash": "2a8ef62" }
+{ "v": "0.0.0", "ts": "2026-01-30T16:48:45-07:00", "msg": "fix code review feedback: UI consistency and queries", "hash": "3dcf84d" }
+{ "v": "0.0.0", "ts": "2026-02-02T19:39:11-07:00", "msg": "add worktree setup script", "hash": "7a868ea" }
+{ "v": "0.0.0", "ts": "2026-02-03T20:59:11-07:00", "msg": "add Claude Code sessions tracking feature", "hash": "d2bd7f9" }
+{ "v": "0.0.0", "ts": "2026-02-04T13:05:36-07:00", "msg": "replace boilerplate with comprehensive README", "hash": "f5125b0" }
+{ "v": "0.0.0", "ts": "2026-02-04T13:42:08-07:00", "msg": "add CLAUDE.md for AI-assisted development context", "hash": "0de632c" }
+{ "v": "0.0.0", "ts": "2026-02-04T13:52:05-07:00", "msg": "add custom logo and enhanced badges to README", "hash": "2ee6f38" }
+{ "v": "0.0.0", "ts": "2026-02-05T15:44:42-07:00", "msg": "add error handling to app detail + deployment links", "hash": "688c15f" }
+{ "v": "0.0.0", "ts": "2026-02-05T17:03:51-07:00", "msg": "fix app card links", "hash": "294d766" }
+{ "v": "0.0.0", "ts": "2026-02-05T17:44:48-07:00", "msg": "fix useRef TypeScript error for React 19", "hash": "13b028e" }
+{ "v": "0.0.0", "ts": "2026-02-05T18:07:36-07:00", "msg": "improve UX consistency across pages", "hash": "d215855" }
+{ "v": "0.0.0", "ts": "2026-02-05T18:12:19-07:00", "msg": "fix remove duplicate tech_stack badges from cards", "hash": "8498f29" }
+{ "v": "0.0.0", "ts": "2026-02-05T18:14:08-07:00", "msg": "fix make page header sticky", "hash": "3ba5673" }
+{ "v": "0.0.0", "ts": "2026-02-05T18:20:43-07:00", "msg": "fix header stays fixed while content scrolls", "hash": "ea9c298" }
+{ "v": "0.0.0", "ts": "2026-02-05T18:22:06-07:00", "msg": "add LocalTime component for timezone-aware dates", "hash": "002a78f" }
+{ "v": "0.0.0", "ts": "2026-02-05T19:24:02-07:00", "msg": "auto-connect GitHub repos to Vercel/Cloudflare", "hash": "5f0e04c" }
+{ "v": "0.0.0", "ts": "2026-02-05T19:40:02-07:00", "msg": "fix remove invalid health_timeout from supabase config", "hash": "31d0e0e" }
+{ "v": "0.0.0", "ts": "2026-02-05T19:51:51-07:00", "msg": "add Auto-Connect button for Vercel/Cloudflare match", "hash": "9a9472f" }
+{ "v": "0.0.0", "ts": "2026-02-05T20:32:22-07:00", "msg": "add tabbed navigation to Settings with changelog", "hash": "f9a09c0" }
+{ "v": "0.0.0", "ts": "2026-02-06T15:31:22-07:00", "msg": "add UI enhancements, provider logos, navigation", "hash": "8ffe727" }
+{ "v": "0.0.0", "ts": "2026-02-06T15:50:42-07:00", "msg": "add bidirectional relationships and logos", "hash": "61fb24e" }
+{ "v": "0.0.0", "ts": "2026-02-06T22:31:45-07:00", "msg": "complete 6-phase cloud tracker refinement", "hash": "cd75803" }
+{ "v": "0.0.0", "ts": "2026-02-06T23:48:33-07:00", "msg": "add GitHub tab to application detail page", "hash": "f8ab509" }
+{ "v": "0.0.0", "ts": "2026-02-07T00:01:14-07:00", "msg": "fix SelectItem empty string value crash on edit", "hash": "50bc8ec" }
+{ "v": "0.0.0", "ts": "2026-02-07T17:54:19-07:00", "msg": "redesign tab nav with full-width header tabs", "hash": "14141c8" }
+{ "v": "0.0.0", "ts": "2026-02-07T18:00:04-07:00", "msg": "fix move tabs above breadcrumbs with backdrop", "hash": "6324f37" }
+{ "v": "0.0.0", "ts": "2026-02-08T21:54:36-07:00", "msg": "add /api/applications for cross-app integration", "hash": "5fc8a36" }
+{ "v": "0.0.0", "ts": "2026-02-08T22:11:00-07:00", "msg": "fix remove display_name from API (migration not run)", "hash": "a8de416" }
+{ "v": "0.0.0", "ts": "2026-02-13T19:12:11-07:00", "msg": "fix deployment sync pipeline for GitHub provider", "hash": "fb066c4" }
+{ "v": "0.0.0", "ts": "2026-02-13T20:18:26-07:00", "msg": "add Cloudflare Workers deployment sync", "hash": "ef8a2c8" }
+{ "v": "0.0.0", "ts": "2026-02-15T05:51:44+00:00", "msg": "strengthen security headers with env-aware CSP", "hash": "ec2f02c" }
+{ "v": "0.0.0", "ts": "2026-02-18T04:02:51-07:00", "msg": "complete 9-task plan: context menus, display_name", "hash": "5f73c9e" }
+{ "v": "0.0.0", "ts": "2026-02-18T04:03:27-07:00", "msg": "add v1.5.0 changelog entry", "hash": "16a2324" }
+{ "v": "0.0.0", "ts": "2026-02-18T04:07:33-07:00", "msg": "security hardening: session ownership + dep updates", "hash": "243e22e" }
